@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Default (Dark Theme) */
+@layer base {
+  :root {
+    /* Dark theme */
+    --background: #0b1e2d; /* Dark navy background */
+    --foreground: #d1e8ff; /* Light blue for text */
+    --card: #162f45; /* Darker card background */
+    --popover: #1a344e; /* Dark popover background */
+    --popover-foreground: #d1e8ff; /* Light blue popover text */
+    --primary: #1b4f72; /* Darker blue primary */
+    --primary-foreground: #f0f5ff;
+    --secondary: #12344d; /* Slightly lighter blue for secondary elements */
+    --secondary-foreground: #d1e8ff;
+    --muted: #1a415c; /* Muted dark blue */
+    --muted-foreground: #a3c1e8;
+    --accent: #154360; /* Dark accent blue */
+    --accent-foreground: #f0f5ff;
+    --destructive: #c0392b;
+    --destructive-foreground: #ffffff;
+    --border: #0b1e2d;
+    --input: #102840;
+    --ring: #1b4f72; /* Focus ring is also darker blue */
+    --radius: 0.5rem;
+    --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+    --card-foreground: #d1e8ff;
+  }
+}
+
+/* Light Theme */
+@layer base {
+  .light {
+    --background: #f4f9fc; /* Light blue-gray background */
+    --foreground: #0b1e2d; /* Dark text */
+    --card: #ffffff;
+    --popover: #dceaf7; /* Light popover background */
+    --popover-foreground: #0b1e2d;
+    --primary: #1b4f72; /* Same darker blue primary */
+    --primary-foreground: #ffffff;
+    --secondary: #e8f0fa; /* Light blue-gray for secondary elements */
+    --secondary-foreground: #0b1e2d;
+    --muted: #d1e8ff; /* Soft blue for muted elements */
+    --muted-foreground: #35475a;
+    --accent: #154360; /* Dark accent blue */
+    --accent-foreground: #ffffff;
+    --destructive: #c0392b;
+    --destructive-foreground: #ffffff;
+    --border: #a4b8ce;
+    --input: #ffffff;
+    --ring: #1b4f72;
+    --radius: 0.5rem;
+    --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+    --card-foreground: #0b1e2d;
+  }
+}
+
+/* Global Styling */
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  input, select, text-area {
+    @apply bg-input text-secondary-foreground rounded-lg p-2 border-border;
+  }
+}
+
+/* Additional Utilities */
+@layer utilities {
+  .text-secondary-foreground {
+    color: var(--secondary-foreground);
+  }
+}
