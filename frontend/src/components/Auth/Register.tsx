@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { createUserWithEmailAndPassword, deleteUser } from 'firebase/auth'
 import React, { useState } from 'react'
 import { auth } from '../../lib/firebase/firebase'
 
@@ -25,6 +25,8 @@ const Register: React.FC<RegisterProps> = ({onClose}) => {
             setError('Passwords do not match')
         }
 
+        let user 
+
         try {
             //? Create User in firebase
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -41,7 +43,7 @@ const Register: React.FC<RegisterProps> = ({onClose}) => {
               };
 
             //? send data to backend
-            const response = await fetch('auth/register', {
+            const response = await fetch('/api/users/auth/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -53,9 +55,16 @@ const Register: React.FC<RegisterProps> = ({onClose}) => {
             if(response.ok) {
                 onClose()
             }else {
-                setError('Registration failed')
+                if(user) {
+                    await deleteUser(user)
+                }
+                setError('Registration failed on the backend, user deleted from Firebase.')
+
             }
         } catch (error) {
+            if(user) {
+                await deleteUser(user)
+            }
             setError('Registration failed')
         }
     }
