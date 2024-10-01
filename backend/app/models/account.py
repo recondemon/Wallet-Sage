@@ -8,4 +8,4 @@ class Account(db.Model):
     name = db.Column(db.String, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
-    envelope_accounts = db.relationship('EnvelopeAccount', backref='account', lazy=True)
+    user = db.relationship('User', backref='accounts', lazy=True)

@@ -10,3 +10,5 @@ class SavingsGoal(db.Model):
     balance = db.Column(db.Integer, nullable=False)
     account = db.Column(db.String, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    user = db.relationship('User', backref='savings_goals', lazy=True)
