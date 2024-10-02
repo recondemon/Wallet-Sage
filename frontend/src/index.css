@@ -6,16 +6,17 @@
 @layer base {
   :root {
     /* Dark theme */
-    --background: #0b1e2d; /* Dark navy background */
+    --background: rgb(10, 20, 40);
+    --alt-background: #101D42;
     --foreground: #d1e8ff; /* Light blue for text */
-    --card: #162f45; /* Darker card background */
+    --card: rgb(28, 42, 72); 
     --popover: #1a344e; /* Dark popover background */
     --popover-foreground: #d1e8ff; /* Light blue popover text */
-    --primary: #1b4f72; /* Darker blue primary */
+    --primary: rgb(255, 193, 7); /* Darker blue primary */
     --primary-foreground: #f0f5ff;
     --secondary: #12344d; /* Slightly lighter blue for secondary elements */
     --secondary-foreground: #d1e8ff;
-    --muted: #1a415c; /* Muted dark blue */
+    --muted: rgb(140, 109, 1); /* Muted dark blue */
     --muted-foreground: #a3c1e8;
     --accent: #154360; /* Dark accent blue */
     --accent-foreground: #f0f5ff;

@@ -6,14 +6,14 @@ import Hero from '../../components/Landing/Hero'
 import AuthModal from '../../components/Modals/AuthModal'
 import Login from '../../components/Auth/Login'
 import Register from '../../components/Auth/Register'
+import { useUserStore } from '../../stores/userStore'
 
 const Landing = () => {
+  //* Stores
+  const { setUser, isLoggedIn } = useUserStore();
 
-  //* Login in States
-  const [isLoggedIn, setIsLoggedIn] = React.useState(false)
+  //* Modal States
   const [showLogInModal, setShowLogInModal] = React.useState(false)
-
-  //* Register States
   const [showRegisterModal, setShowRegisterModal] = React.useState(false)
 
   //* Other States
@@ -23,10 +23,11 @@ const Landing = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if(user) {
-        setIsLoggedIn(true)
-        navigate('/home')
-      }else {
-        setIsLoggedIn(false)
+        setUser({
+          uid: user.uid,
+          email: user.email || '',
+      })
+      navigate('/home')
       }
     })
     return () => unsubscribe()

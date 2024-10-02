@@ -12,6 +12,7 @@ const config: Config = {
         input: 'var(--input)',
         ring: 'var(--ring)',
         background: 'var(--background)',
+        altBackground: 'var(--alt-background)',
         foreground: 'var(--foreground)',
         shadow: 'var(--shadow)',
         primary: 'var(--primary)',

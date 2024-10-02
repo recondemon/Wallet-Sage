@@ -1,6 +1,7 @@
 import { createUserWithEmailAndPassword, deleteUser } from 'firebase/auth'
 import React, { useState } from 'react'
 import { auth } from '../../lib/firebase/firebase'
+import { useUserStore } from '../../stores/userStore'
 
 interface RegisterProps {
     onClose: () => void
@@ -16,6 +17,7 @@ const Register: React.FC<RegisterProps> = ({onClose}) => {
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
     const [error, setError] = useState('')
+    const { setUser } = useUserStore();
 
     //* Register Function
     //! ---- Move registration logic to authUtils.ts? maybe... ----
@@ -53,6 +55,14 @@ const Register: React.FC<RegisterProps> = ({onClose}) => {
             
             //! ---- add better error handling ----
             if(response.ok) {
+                setUser({
+                    uid: user.uid,
+                    email: user.email || '',
+                    username: userName,
+                    firstName,
+                    lastName,
+                    dob,
+                  });
                 onClose()
             }else {
                 if(user) {
