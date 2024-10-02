@@ -1,0 +1,7 @@
+[TYPECHECK]
+ignored-classes=SQLAlchemy,scoped_session
+generated-members=Column
+[MASTER]
+load-plugins=pylint_flask_sqlalchemy
+[MESSAGES CONTROL]
+disable=E1101

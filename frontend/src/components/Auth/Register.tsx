@@ -53,9 +53,12 @@ const Register: React.FC<RegisterProps> = ({onClose}) => {
                 body: JSON.stringify(userData)
             });
             
+            const result = await response.json();
+
             //! ---- add better error handling ----
             if(response.ok) {
                 setUser({
+                    id: result.id,
                     uid: user.uid,
                     email: user.email || '',
                     username: userName,
@@ -68,7 +71,7 @@ const Register: React.FC<RegisterProps> = ({onClose}) => {
                 if(user) {
                     await deleteUser(user)
                 }
-                setError('Registration failed on the backend, user deleted from Firebase.')
+                setError(result.error || 'Registration failed on the backend');
 
             }
         } catch (error) {

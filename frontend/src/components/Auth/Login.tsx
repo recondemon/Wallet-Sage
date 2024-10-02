@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../lib/firebase/firebase';
+import { useUserStore } from '../../stores/userStore';
 
 interface LoginProps {
   onClose: () => void;
@@ -15,11 +16,39 @@ const Login: React.FC<LoginProps> = ({ onClose }) => {
   //* Login Function
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    //! ---- add better error handling ----
+  
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const firebaseUser = userCredential.user;
+  
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ uid: firebaseUser.uid }),  
+      });
+  
+      const userData = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(userData.error || 'Failed to fetch user data from backend');
+      }
+  
+      const setUser = useUserStore((state) => state.setUser);
+      setUser({
+        id: userData.id,
+        uid: userData.uid,
+        email: userData.email,
+        username: userData.username,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        dob: userData.dob,
+      });
+  
       onClose();
+  
     } catch (error) {
       setError('Login failed, please try again.');
     }

@@ -5,13 +5,16 @@ name = "pypi"
 
 [packages]
 flask = "*"
-flask-sqlalchemy = "==2.5.1"
+flask-sqlalchemy = "*"
 flask-cors = "==3.0.10"
 flask-migrate = "*"
 sqlalchemy = "==1.4.46"
 alembic = "*"
 werkzeug = "==2.0.3"
 python-dotenv = "*"
+plaid = "*"
+plaid-python = "*"
+flask-sqlalchemy-stubs = "*"
 
 [dev-packages]
 

@@ -1,22 +1,22 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { PlaidLinkButton } from '../../UI/PlaidLinkButton'
+import { useUserStore } from '../../../stores/userStore'
+
 
 const Accounts = () => {
-    const handleAddAccount = () => {
-        console.log('Add New Account')
+    const user = useUserStore(state => state.user)
+
+    useEffect(() => {
+        console.log(user)
     }
-    
+    , [user])
   return (
     <div>
         <div>
             <h2>
                 Accounts
             </h2>
-            <p
-            className=''
-            onClick={handleAddAccount}
-            >
-                Add New Account
-            </p>
+            <PlaidLinkButton userId={user?.uid} />
         </div>
     </div>
   )
