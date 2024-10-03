@@ -14,7 +14,7 @@ const Credit = () => {
 
 
   return (
-    <div className='flex flex-col p-4 border-2 w-1/3 rounded-lg bg-card'>
+    <div className='flex flex-col p-4 border-2 w-full rounded-lg bg-card'>
         <div>
             <p className='text-2xl text-left my-0 py-0'>
                 Available

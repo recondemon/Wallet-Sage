@@ -50,7 +50,7 @@ const Balance = () => {
     , [accounts, institutions])
 
   return (
-    <div className='flex flex-col p-4 border-2 w-1/3 rounded-lg bg-card'>
+    <div className='flex flex-col p-4 border-2 w-1/2 rounded-lg bg-card'>
         <div className='flex flex-col'>
             <p className='text-3vw text-center my-0 py-0'>
                 ${totalBalance}

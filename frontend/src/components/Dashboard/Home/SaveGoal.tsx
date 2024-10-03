@@ -60,7 +60,7 @@ const SaveGoal = () => {
   }, [data, options]);
 
   return (
-    <div className="flex flex-col p-4 w-1/3">
+    <div className="flex flex-col p-4 w-1/2 bg-card border-2 rounded-lg">
       <canvas 
       ref={chartRef} 
       className='w-40 h-40'

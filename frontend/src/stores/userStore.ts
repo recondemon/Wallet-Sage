@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
-interface User {
+export interface User {
   id: string;
-  uid: string;
+  uid: string | undefined;
   email: string;
   username?: string;
   firstName?: string;

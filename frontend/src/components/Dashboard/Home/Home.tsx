@@ -3,7 +3,7 @@ import Balance from './Balance'
 import Accounts from './Accounts/Accounts'
 import SaveGoal from './SaveGoal'
 import { usePlaidStore } from '../../../stores/plaidStore'
-import { useUserStore } from '../../../stores/userStore'
+import { User, useUserStore } from '../../../stores/userStore'
 import MainContent from './MainContent'
 import Credit from './Credit'
 
@@ -13,20 +13,28 @@ const Home = () => {
   const user = useUserStore(state => state.user)
 
   useEffect(() => {
-    fetchPlaidData(user?.uid)
-    console.log('fetching plaid data')
-    console.log('accounts: ', accounts)
+    if(user && user.uid){
+      fetchPlaidData(user.uid)
+      console.log('fetching plaid data')
+      console.log('accounts: ', accounts)
+    }
   }, [fetchPlaidData, user?.uid])
   return (
-    <div className='flex flex-col p-4 m-4 rounded-lg justify-center w-[80vw] mx-auto gap-4'>
-      
-      {/* top row (Balance info, Savings Goal, Credit info) */}
-      <div className='flex w-full'>
-        <Balance />
-        <SaveGoal />
-        <Credit />
+    <div className='flex flex-col p-4 m-4 rounded-lg justify-center items-center w-[80vw] h-[95vh] mx-auto gap-4'>
+      <div className='flex flex-col'>
+
       </div>
-      <div className='flex w-full'>
+      {/* top row (Balance info, Savings Goal, Credit info) */}
+      <div className='flex w-full h-[30vh] gap-4'>
+        <div className='flex gap-4 w-2/3'>
+          <Balance />
+          <SaveGoal />          
+        </div>
+        <div className='flex w-1/3'>
+          <Credit />
+        </div>
+      </div>
+      <div className='flex w-full h-[60vh]'>
         <MainContent />
         <Accounts accounts={accounts}/>
       </div>

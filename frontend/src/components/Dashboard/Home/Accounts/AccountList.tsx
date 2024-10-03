@@ -7,11 +7,15 @@ interface AccountListProps {
     accounts: Account[];
     }
 
+interface GroupedAccounts {
+  [institution_name: string]: Account[];
+  }
+
 const AccountsList: React.FC<AccountListProps> = ({ accounts }) => {
-  const [groupedAccounts, setGroupedAccounts] = useState({});
+  const [groupedAccounts, setGroupedAccounts] = useState<GroupedAccounts>({});
 
   useEffect(() => {
-    const grouped = accounts.reduce((result, account) => {
+    const grouped = accounts.reduce<GroupedAccounts>((result, account) => {
       if (!result[account.institution_name]) {
         result[account.institution_name] = [];
       }
