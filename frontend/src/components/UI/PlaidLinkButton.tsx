@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { usePlaidStore } from '../../stores/plaidStore'
 
 interface PlaidLinkButtonProps {
-    userId: string;
+    userId: string | undefined;
     }
 
 export const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({ userId }) => {
@@ -69,5 +69,14 @@ export const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({ userId }) => {
       return <div>Loading...</div>;
     }
   
-    return <button onClick={() => open()} disabled={!ready}>Connect Bank</button>;
+    return (
+        <button 
+        onClick={() => open()} 
+        disabled={!ready}
+        className='p-2 hover:cursor-pointer hover:bg-muted rounded-lg'        
+        >
+            Connect Bank
+        </button>
+    ) 
+        
   };

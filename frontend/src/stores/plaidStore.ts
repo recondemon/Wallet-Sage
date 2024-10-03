@@ -6,6 +6,7 @@ interface Account {
   name: string;
   type: string;
   institution_name: string;
+  balance: number;
 }
 
 interface Institution {
@@ -19,6 +20,7 @@ interface PlaidStore {
   setInstitutions: (institutions: Institution[]) => void;
   setAccounts: (accounts: Account[]) => void;
   clearPlaidData: () => void;
+  fetchPlaidData: (userId: string) => Promise<void>;
 }
 
 export const usePlaidStore = create<PlaidStore>()(
@@ -29,6 +31,30 @@ export const usePlaidStore = create<PlaidStore>()(
       setInstitutions: (institutions) => set(() => ({ institutions })),
       setAccounts: (accounts) => set(() => ({ accounts })),
       clearPlaidData: () => set(() => ({ institutions: [], accounts: [] })),
+
+      fetchPlaidData: async (userId) => {
+        try {
+          const response = await fetch('/api/plaid/fetch_accounts', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ user_id: userId }),
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch accounts from Plaid');
+          }
+
+          const data = await response.json();
+          console.log('data: ', data);
+          set({ institutions: data.institutions });
+          set({ accounts: data.accounts });
+
+        } catch (error) {
+          console.error('Error fetching accounts:', error);
+        }
+      },
     }),
     {
       name: 'plaid-storage',

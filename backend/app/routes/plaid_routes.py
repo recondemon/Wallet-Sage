@@ -77,6 +77,12 @@ def exchange_public_token():
         logging.error(traceback.format_exc())
         return jsonify({"error": str(e)}), 500
 
+#! ---- TODO: Seperate Route Logic ----
+#! 1. Fetch accounts for adding new accounts, ignoring existing accounts
+#! 2. Fetch balances for updating existing balances
+#! 3. Fetch transactions for updating existing transactions
+#! ---------------------------------------------------------------------
+
 #**** Fetch accounts from Plaid ****#
 @plaid_bp.route('/fetch_accounts', methods=['POST'])
 def fetch_accounts():
@@ -98,70 +104,109 @@ def fetch_accounts():
         logging.info(f"Fetching accounts from Plaid with access token: {access_token}")
         accounts_response = plaid_client.accounts_get(AccountsGetRequest(access_token=access_token))
 
+        logging.info(f"Plaid accounts response: {accounts_response}")
+
         institutions = []
         accounts = []
 
-        for account in accounts_response['accounts']:
-            institution_id = getattr(account, 'institution_id', None)
+        institution_id = accounts_response['item'].get('institution_id')
+        institution_name = 'Unknown Institution'
 
-            if institution_id:
-                logging.info(f"Fetching institution details for ID: {institution_id}")
-                institution_response = plaid_client.institutions_get_by_id(InstitutionsGetByIdRequest(institution_id=institution_id))
-                institution_name = institution_response.institution.name
+        if institution_id:
+            logging.info(f"Fetching institution details for ID: {institution_id}")
+            institution_response = plaid_client.institutions_get_by_id(
+                InstitutionsGetByIdRequest(
+                    institution_id=institution_id, 
+                    country_codes=[CountryCode('US')]
+                )
+            )
+            institution_name = institution_response.institution.name
+            logging.info(f"Institution name: {institution_name}")
 
-                institution = Institution.query.filter_by(institution_id=institution_id).first()
+            institution = Institution.query.filter_by(institution_id=institution_id).first()
+            if not institution:
+                institution = Institution(
+                    name=institution_name,
+                    institution_id=institution_id,
+                    user_id=user.id
+                )
+                db.session.add(institution)
+                db.session.flush()
 
-                if not institution:
-                    institution = Institution(
-                        name=institution_name,
-                        institution_id=institution_id,
-                        user_id=user.id
-                    )
-                    db.session.add(institution)
-                    db.session.flush()
-
+            if not any(inst['institution_id'] == institution_id for inst in institutions):
                 institutions.append({
-                    'institution_id': institution.institution_id,
+                    'institution_id': institution_id,
                     'name': institution_name
                 })
 
-            else:
-                logging.warning(f"Institution ID missing for account {account.account_id}")
 
-                generated_institution_id = str(uuid.uuid4())
+        for account in accounts_response['accounts']:
+            account_institution_id = getattr(account, 'institution_id', institution_id)
+
+            if not account_institution_id:
+                logging.warning(f"Institution ID missing for account {account['account_id']}")
+                account_institution_id = str(uuid.uuid4())
 
                 institution = Institution.query.filter_by(name='Unknown Institution', user_id=user.id).first()
-
                 if not institution:
                     institution = Institution(
                         name='Unknown Institution',
-                        institution_id=generated_institution_id,
+                        institution_id=account_institution_id,
+                        user_id=user.id
+                    )
+                    db.session.add(institution)
+                    db.session.flush()
+            else:
+                logging.info(f"Fetching institution details for account institution ID: {account_institution_id}")
+                institution_response = plaid_client.institutions_get_by_id(
+                    InstitutionsGetByIdRequest(
+                        institution_id=account_institution_id,
+                        country_codes=[CountryCode('US')]
+                    )
+                )
+                account_institution_name = institution_response.institution.name
+                logging.info(f"Institution name for account: {account_institution_name}")
+
+                institution = Institution.query.filter_by(institution_id=account_institution_id).first()
+                if not institution:
+                    institution = Institution(
+                        name=account_institution_name,
+                        institution_id=account_institution_id,
                         user_id=user.id
                     )
                     db.session.add(institution)
                     db.session.flush()
 
-                institutions.append({
-                    'institution_id': generated_institution_id,
-                    'name': 'Unknown Institution'
-                })
+                if not any(inst['institution_id'] == account_institution_id for inst in institutions):
+                    institutions.append({
+                        'institution_id': account_institution_id,
+                        'name': account_institution_name
+                    })
 
-            balance = account.balances.current if account.balances.current is not None else 0.0
+            account_type = str(account['subtype']) if account['subtype'] else 'unknown'
+            balance = account['balances']['current'] if account['balances']['current'] else 0.0
 
-            account_model = Account(
-                account_id=account.account_id,
-                balance=balance,
-                name=account.name,
-                type=str(account.subtype),
-                user_id=user.id,
-                institution_id=institution.id
-            )
-            db.session.add(account_model)
+            existing_account = Account.query.filter_by(account_id=account['account_id']).first()
+            if existing_account:
+                existing_account.balance = balance
+                existing_account.name = account['name']
+                existing_account.type = account_type
+                existing_account.institution_id = institution.id
+            else:
+                account_model = Account(
+                    account_id=account['account_id'],
+                    balance=balance,
+                    name=account['name'],
+                    type=account_type,
+                    user_id=user.id,
+                    institution_id=institution.id
+                )
+                db.session.add(account_model)
 
             accounts.append({
-                'account_id': account.account_id,
-                'name': account.name,
-                'type': str(account.subtype),
+                'account_id': account['account_id'],
+                'name': account['name'],
+                'type': account_type,
                 'balance': balance,
                 'institution_name': institution.name
             })
@@ -178,6 +223,8 @@ def fetch_accounts():
         logging.error(f"Error fetching accounts: {str(e)}")
         logging.error(traceback.format_exc())
         return jsonify({"error": str(e)}), 500
+
+
 
 
 
