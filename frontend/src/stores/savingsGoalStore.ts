@@ -22,7 +22,7 @@ export const useSavingsGoalStore = create<SavingsGoalStore>()(
         }));
 
         try {
-          const response = await fetch('/api/savingsgoals/create', {
+          const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/savingsgoals/create`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -51,7 +51,7 @@ export const useSavingsGoalStore = create<SavingsGoalStore>()(
         }));
 
         try {
-          const response = await fetch('/api/savingsgoals/delete', {
+          const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/savingsgoals/delete`, {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json',
@@ -73,7 +73,7 @@ export const useSavingsGoalStore = create<SavingsGoalStore>()(
 
       getAndUpdateSavingsGoals: async (userId: string) => {
         try {
-          const response = await fetch(`/api/savingsgoals/get?uid=${userId}`);
+          const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/savingsgoals/get?uid=${userId}`);
           if (!response.ok) {
             throw new Error('Failed to fetch savings goals from the server.');
           }

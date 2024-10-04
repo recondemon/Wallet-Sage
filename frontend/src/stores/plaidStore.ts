@@ -43,7 +43,7 @@ export const usePlaidStore = create<PlaidStore>()(
           const checkData = await checkResponse.json();
 
           if (checkData.hasAccounts) {
-            const refreshResponse = await fetch('/api/plaid/refresh_accounts', {
+            const refreshResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/plaid/refresh_accounts`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ export const usePlaidStore = create<PlaidStore>()(
             set({ institutions: refreshData.institutions });
             set({ accounts: refreshData.accounts });
           } else {
-            const newResponse = await fetch('/api/plaid/fetch_accounts', {
+            const newResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/plaid/fetch_accounts`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -87,7 +87,7 @@ export const usePlaidStore = create<PlaidStore>()(
             accounts: [],
           }));
 
-          const refreshResponse = await fetch('/api/plaid/refresh_accounts', {
+          const refreshResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/plaid/refresh_accounts`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

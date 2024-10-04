@@ -60,7 +60,7 @@ const Register: React.FC<RegisterProps> = ({ onClose }) => {
       };
 
       //? send data to backend
-      const response = await fetch('/api/users/auth/register', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/users/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
