@@ -26,14 +26,17 @@ const Register: React.FC<RegisterProps> = ({onClose}) => {
         if(password !== confirmPassword) {
             setError('Passwords do not match')
         }
+        if(!firstName || !lastName || !email || !userName || !dob || !password || !confirmPassword) {
+            setError('Please fill out all fields')
+        }
 
         let user 
 
         try {
             //? Create User in firebase
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-
+            user = userCredential.user;
+    
             //? prepare data for backend
             const userData = {
                 uid: user.uid,
@@ -42,45 +45,49 @@ const Register: React.FC<RegisterProps> = ({onClose}) => {
                 userName,
                 dob,
                 email,
-              };
-
+            };
+    
             //? send data to backend
             const response = await fetch('/api/users/auth/register', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(userData)
+                body: JSON.stringify(userData),
             });
-            
+    
             const result = await response.json();
-
-            //! ---- add better error handling ----
-            if(response.ok) {
-                setUser({
-                    id: result.id,
-                    uid: user.uid,
-                    email: user.email || '',
-                    username: userName,
-                    firstName,
-                    lastName,
-                    dob,
-                  });
-                onClose()
-            }else {
-                if(user) {
-                    await deleteUser(user)
+    
+            //! Improved error handling
+            if (!response.ok) {
+                if (user) {
+                    await deleteUser(user);
                 }
                 setError(result.error || 'Registration failed on the backend');
-
+                return;
             }
+    
+            
+            setUser({
+                id: result.id,
+                uid: user.uid,
+                email: user.email || '',
+                username: userName,
+                firstName,
+                lastName,
+                dob,
+            });
+    
+            onClose(); 
+    
         } catch (error) {
-            if(user) {
-                await deleteUser(user)
+            
+            if (user) {
+                await deleteUser(user);
             }
-            setError('Registration failed')
+            setError('Registration failed: ' + error.message);
         }
-    }
+    };
 
     //! ---- TODO: add validations below ----
     //! file "authUtils.ts" to hold validation logic
@@ -143,8 +150,11 @@ const Register: React.FC<RegisterProps> = ({onClose}) => {
                 <input
                     type='password'
                     placeholder='Confirm Password'
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                 />
             </div>
+            {error && <p className='text-destructive'>{error}</p>}
             <button
             className='bg-primary p-2 w-full rounded-lg hover:bg-muted hover:shadow-lg shadow-shadow'
             type='submit'

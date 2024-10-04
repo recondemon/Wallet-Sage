@@ -6,19 +6,32 @@ import { usePlaidStore } from '../../../stores/plaidStore'
 import { User, useUserStore } from '../../../stores/userStore'
 import MainContent from './MainContent'
 import Credit from './Credit'
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
   const accounts = usePlaidStore(state => state.accounts);
   const fetchPlaidData = usePlaidStore(state => state.fetchPlaidData)
   const user = useUserStore(state => state.user)
+  const navigate = useNavigate(); 
+  const auth = getAuth();
 
   useEffect(() => {
-    if(user && user.uid){
-      fetchPlaidData(user.uid)
-      console.log('fetching plaid data')
-      console.log('accounts: ', accounts)
-    }
-  }, [fetchPlaidData, user?.uid])
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if(!currentUser) {
+        navigate('/');
+      } else {
+        if(user && user.uid){
+          fetchPlaidData(user.uid)
+          console.log('fetching plaid data')
+          console.log('accounts: ', accounts)
+        }
+      }
+    })
+
+    return () => unsubscribe()
+  }, [auth, user, accounts, navigate, fetchPlaidData, user?.uid])
+
   return (
     <div className='flex flex-col p-4 m-4 rounded-lg justify-center items-center w-[80vw] h-[95vh] mx-auto gap-4'>
       <div className='flex flex-col'>
