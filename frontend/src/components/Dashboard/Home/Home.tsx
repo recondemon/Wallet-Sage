@@ -17,6 +17,7 @@ const Home = () => {
   const auth = getAuth();
 
   useEffect(() => {
+    console.log(user)
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if(!currentUser) {
         navigate('/');

@@ -6,6 +6,7 @@ import AccountsList from './AccountList'
 import { Account } from '../../../../lib/types/AccountTypes'
 import { ArrowLeftRight, MoreHorizontal, RefreshCcw, Settings } from 'lucide-react';
 import Dropdown from '../../../UI/DropDown'
+import { useSavingsGoalStore } from '../../../../stores/savingsGoalStore';
 interface AccountsProps {
     accounts: Account[]
 }
@@ -13,13 +14,21 @@ const Accounts: React.FC<AccountsProps> = ({accounts}) => {
     //* Stores
     const user = useUserStore(state => state.user)
     const refreshAccounts = usePlaidStore(state => state.refreshAccounts)
+    const savingsGoals = useSavingsGoalStore(state => state.savingsGoals)
+    const getAndUpdateSavingsGoals = useSavingsGoalStore(state => state.getAndUpdateSavingsGoals)
 
     //* Drop down state
     const [menuOpen, setMenuOpen] = useState(false)
 
     const handleRefresh = () => {
         console.log('refreshing accounts')
-        refreshAccounts(user?.uid)
+        refreshAccounts(user?.uid ?? '');
+        console.log('accounts:', accounts)
+
+        console.log('refreshing savings goals')
+        getAndUpdateSavingsGoals(user?.uid ?? '');
+        console.log('savings goals:', savingsGoals)
+        
     }
 
   return (

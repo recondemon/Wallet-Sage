@@ -6,7 +6,8 @@ import { useSavingsGoalStore } from '../../../../stores/savingsGoalStore';
 import GoalDetails from './GoalDetails';
 import { Plus } from 'lucide-react';
 import UniversalModal from '../../../Modals/UniversalModal';
-import NewSavingsGoal from './NewSAvingsGoal';
+import NewSavingsGoal from './NewSavingsGoal';
+
 
 const SaveGoal = () => {
 //* Stores
@@ -20,8 +21,8 @@ const handleOpenNewGoal = () => {
 }
 
   return (
-    <div className="flex p-4 w-1/2 bg-card border-2 rounded-lg">
-      <div className='flex justify-between w-full'>
+    <div className="flex flex-col p-4 w-1/2 bg-card border-2 rounded-lg">
+      <div className='flex justify-between w-full mb-4'>
         <h1 className='text-xl font-bold'>Savings Goals</h1>
         <div onClick={handleOpenNewGoal}>
           <Plus className='w-6 h-6 ml-2' />
@@ -32,13 +33,13 @@ const handleOpenNewGoal = () => {
           <div className='w-1/2 h-full'>
             <ChartComponent goal={goal} />
           </div>
-          <div className='w-1/2'>
+          <div className='w-1/2 px-4'>
             <GoalDetails goal={goal} />
           </div>
         </div>
       ))}
       { isOpen && (
-        <UniversalModal  onClose={() => setIsOpen(false)} >
+        <UniversalModal onClose={() => setIsOpen(false)}>
           <NewSavingsGoal />
         </UniversalModal>
       )}

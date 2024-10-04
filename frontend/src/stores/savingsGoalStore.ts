@@ -1,24 +1,22 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { Account, SavingsGoal } from '../lib/types/AccountTypes';
 
-interface SavingsGoal {
-    id: string;
-    name: string;
-    targetAmount: number;
-    currentAmount: number;
-}
+
 
 interface SavingsGoalStore {
     savingsGoals: SavingsGoal[];
+    accounts: Account[]; 
     addSavingsGoal: (savingsGoal: SavingsGoal) => Promise<void>;
-    removeSavingsGoal: (id: string) => void;
-    updateSavingsGoal: (id: string, updatedGoal: SavingsGoal) => void;
+    removeSavingsGoal: (id: string, uid: string) => Promise<void>;
+    getAndUpdateSavingsGoals: (userId: string) => Promise<void>;
 }
 
 export const useSavingsGoalStore = create<SavingsGoalStore>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             savingsGoals: [],
+            accounts: [], 
 
             addSavingsGoal: async (savingsGoal: SavingsGoal) => {
                 set((state) => ({
@@ -26,7 +24,7 @@ export const useSavingsGoalStore = create<SavingsGoalStore>()(
                 }));
 
                 try {
-                    const response = await fetch('/api/savingsGoals', {
+                    const response = await fetch('/api/savingsgoals/create', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -45,15 +43,72 @@ export const useSavingsGoalStore = create<SavingsGoalStore>()(
                 }
             },
 
-            removeSavingsGoal: (id: string) => set((state) => ({
-                savingsGoals: state.savingsGoals.filter((goal) => goal.id !== id),
-            })),
+            removeSavingsGoal: async (id: string, uid: string) => {
+                const currentState = get().savingsGoals;
 
-            updateSavingsGoal: (id: string, updatedGoal: SavingsGoal) => set((state) => ({
-                savingsGoals: state.savingsGoals.map((goal) =>
-                    goal.id === id ? updatedGoal : goal
-                ),
-            })),
+                set((state) => ({
+                    savingsGoals: state.savingsGoals.filter((goal) => goal.id !== id),
+                }));
+
+                try {
+                    const response = await fetch('/api/savingsgoals/delete', {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ savingsGoalId: id, uid }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to delete savings goal from the server.');
+                    }
+                } catch (error) {
+                    console.error('Error deleting savings goal:', error);
+
+                    set(() => ({
+                        savingsGoals: currentState,
+                    }));
+                }
+            },
+
+            getAndUpdateSavingsGoals: async (userId: string) => {
+                try {
+                    const response = await fetch(`/api/savingsgoals/get?uid=${userId}`);
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch savings goals from the server.');
+                    }
+
+                    const { savingsGoals } = await response.json();
+
+                    const state = get();
+                    
+                    const updatedGoals = savingsGoals.map((goal: SavingsGoal) => {
+                        const linkedAccounts = state.accounts.filter((account: Account) =>
+                            goal.accounts.includes(account.account_id)
+                        );
+
+                        const updatedBalance = linkedAccounts.reduce(
+                            (total: number, account: Account) => total + account.balance,
+                            0
+                        );
+
+                        if (updatedBalance !== goal.balance) {
+                            return {
+                                ...goal,
+                                balance: updatedBalance,
+                            };
+                        }
+
+                        return goal;
+                    });
+
+                    set(() => ({
+                        savingsGoals: updatedGoals,
+                    }));
+                } catch (error) {
+                    console.error('Error fetching or updating savings goals:', error);
+                }
+            },
         }),
         {
             name: 'savings-goal-storage',

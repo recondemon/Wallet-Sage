@@ -11,3 +11,13 @@ export interface Institution {
     institution_id: string;
     name: string;
     }
+
+export interface SavingsGoal {
+        id: string;
+        name: string;
+        goal: number;
+        balance: number;
+        description?: string;
+        accounts: string[];
+        userId: string;
+    }

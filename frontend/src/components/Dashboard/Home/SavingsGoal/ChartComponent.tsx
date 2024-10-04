@@ -1,38 +1,40 @@
 import React, { useRef, useEffect, useState, useMemo } from 'react';
-import { Doughnut } from 'react-chartjs-2';
+import Chart from 'chart.js/auto';
 import ChartJS from 'chart.js/auto';
+import { SavingsGoal } from '../../../../lib/types/AccountTypes';
 
-interface Goal {
-  name: string;
-  targetAmount: number;
-  currentAmount: number;
-}
+
 
 interface ChartProps {
-  goal: Goal;
+  goal: SavingsGoal;
 }
 
 const ChartComponent: React.FC<ChartProps> = ({ goal }) => {
   const chartRef = useRef<HTMLCanvasElement | null>(null);
-  const [chartInstance, setChartInstance] = useState<ChartJS | null>(null);
+  const [chartInstance, setChartInstance] = useState<Chart<'doughnut'> | null>(null);
 
-  const { name, targetAmount, currentAmount } = goal;
-  const remaining = targetAmount - currentAmount;
+  const {goal: goalAmount, balance } = goal;
+  const remaining = goalAmount - balance;
 
+
+  useEffect(() => {
+    console.log('Goal:', goal);
+  }
+  , [goal]);
   const data = useMemo(
     () => ({
-      labels: ['Saved', 'Remaining'],
       datasets: [
         {
           label: 'Goal',
-          data: [currentAmount, remaining],
+          data: [ remaining, balance],
           backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)'],
           borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)'],
           borderWidth: 1,
         },
       ],
+      labels: ['Remaining', 'Saved'],
     }),
-    [currentAmount, remaining]
+    [balance, remaining]
   );
 
   const options = useMemo(

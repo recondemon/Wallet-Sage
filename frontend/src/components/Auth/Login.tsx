@@ -3,12 +3,17 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../lib/firebase/firebase';
 import { useUserStore } from '../../stores/userStore';
 import { usePlaidStore } from '../../stores/plaidStore';
+import { useSavingsGoalStore } from '../../stores/savingsGoalStore';
 
 interface LoginProps {
   onClose: () => void;
 }
 
 const Login: React.FC<LoginProps> = ({ onClose }) => {
+  //* stores
+  const user = useUserStore((state) => state.user);
+  const savingsGoals = useSavingsGoalStore((state) => state.savingsGoals);
+
   //* Form States
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -48,10 +53,18 @@ const Login: React.FC<LoginProps> = ({ onClose }) => {
         dob: userData.dob,
       });
       
+      console.log('Login successful');
+
+      console.log('Refreshing accounts');
       const refreshAccounts = usePlaidStore((state) => state.refreshAccounts);
       await refreshAccounts(firebaseUser.uid);
+      
+      console.log('Fetching and updating savings goals');
+      const getAndUpdateSavingsGoals = useSavingsGoalStore((state) => state.getAndUpdateSavingsGoals);
+      await getAndUpdateSavingsGoals(firebaseUser.uid);
 
-      console.log('Login successful');
+      console.log('user:', user);
+      console.log('savingsGoals:', savingsGoals);
 
       onClose();
   

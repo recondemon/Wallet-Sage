@@ -38,9 +38,11 @@ def create_app():
     with app.app_context():
         from app.routes.user_routes import user_bp
         from app.routes.plaid_routes import plaid_bp
+        from app.routes.savings_goal_routes import savings_goal_bp
         
         app.register_blueprint(user_bp, url_prefix='/api/users')
         app.register_blueprint(plaid_bp, url_prefix='/api/plaid')
+        app.register_blueprint(savings_goal_bp, url_prefix='/api/savingsgoals')
     return app
 
 def configure_logging(app):

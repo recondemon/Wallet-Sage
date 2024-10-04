@@ -1,12 +1,27 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { SavingsGoal } from '../../../../lib/types/AccountTypes';
+import { useSavingsGoalStore } from '../../../../stores/savingsGoalStore';
 
-const GoalDetails = () => {
+
+interface GoalDetailsProps {
+  goal: SavingsGoal;
+}
+
+const GoalDetails: React.FC<GoalDetailsProps> = ({goal}) => {
+  const { name, goal: goalAmount, balance } = goal;
+  const remaining = goalAmount - balance;
+
+  useEffect(() => {
+    console.log('Goal:', goal);
+  }
+  , [goal]);
+
   return (
     <div>
-        <h1 className='text-xl font-bold'>Savings Goal</h1>
-        <p className='text-sm'>Goal: $5000</p>
-        <p className='text-sm'>Saved: $2500</p>
-        <p className='text-sm'>Remaining: $2500</p>
+        <h1 className='text-1vw font-bold'>{name}</h1>
+        <p className='text-.8vw'>Target: {goalAmount}</p>
+        <p className='text-.8vw'>Saved: {balance}</p>
+        <p className='text-.8vw'>Remaining: {remaining}</p>
     </div>
   )
 }
