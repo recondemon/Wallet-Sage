@@ -9,9 +9,20 @@ from plaid.model.accounts_get_request import AccountsGetRequest
 from plaid.model.institutions_get_by_id_request import InstitutionsGetByIdRequest
 from plaid.model.accounts_balance_get_request import AccountsBalanceGetRequest
 from app import plaid_client
+from sqlalchemy import Enum
+from enum import Enum as PyEnum
 import traceback
 import logging
 import uuid
+
+
+class AccountSubtype(Enum):
+    CHECKING = "checking"
+    SAVINGS = "savings"
+    CREDIT = "credit"
+    LOAN = "loan"
+    UNKNOWN = "unknown"
+
 
 plaid_bp = Blueprint('plaid', __name__)
 
@@ -267,3 +278,163 @@ def fetch_balances():
         logging.error(f"Error fetching balances: {str(e)}")
         logging.error(traceback.format_exc())
         return jsonify({"error": str(e)}), 500
+
+#**** Check if user has accounts ****#
+@plaid_bp.route('/check_accounts', methods=['POST'])
+def check_accounts():
+    user_uid = request.json.get('user_id')
+    
+    logging.info(f"Checking accounts for user: {user_uid}")
+
+    user = User.query.filter_by(uid=user_uid).first()
+    if user is None:
+        logging.error(f"User not found for UID: {user_uid}")
+        return jsonify({"error": "User not found"}), 404
+
+    accounts_exist = Account.query.filter_by(user_id=user.id).count() > 0
+
+    return jsonify({"hasAccounts": accounts_exist})
+
+
+#**** Refresh accounts from Plaid ****#
+@plaid_bp.route('/refresh_accounts', methods=['POST'])
+def refresh_accounts():
+    user_uid = request.json.get('user_id')
+
+    logging.info(f"Refreshing accounts for user: {user_uid}")
+
+    user = User.query.filter_by(uid=user_uid).first()
+    if user is None:
+        logging.error(f"User not found for UID: {user_uid}")
+        return jsonify({"error": "User not found"}), 404
+
+    access_token = user.plaid_access_token
+    if not access_token:
+        logging.error(f"No Plaid access token found for user {user_uid}")
+        return jsonify({"error": "No Plaid access token found for user"}), 400
+
+    try:
+        logging.info(f"Fetching accounts from Plaid with access token: {access_token}")
+        accounts_response = plaid_client.accounts_get(AccountsGetRequest(access_token=access_token))
+
+        logging.info(f"Plaid accounts response: {accounts_response}")
+
+        institutions = []
+        accounts = []
+
+        institution_id = accounts_response['item'].get('institution_id')
+        institution_name = 'Unknown Institution'
+
+        if institution_id:
+            logging.info(f"Fetching institution details for ID: {institution_id}")
+            institution_response = plaid_client.institutions_get_by_id(
+                InstitutionsGetByIdRequest(
+                    institution_id=institution_id, 
+                    country_codes=[CountryCode('US')]
+                )
+            )
+            institution_name = institution_response.institution.name
+            logging.info(f"Institution name: {institution_name}")
+
+            institution = Institution.query.filter_by(institution_id=institution_id).first()
+            if not institution:
+                institution = Institution(
+                    name=institution_name,
+                    institution_id=institution_id,
+                    user_id=user.id
+                )
+                db.session.add(institution)
+                db.session.flush()
+
+            if not any(inst['institution_id'] == institution_id for inst in institutions):
+                institutions.append({
+                    'institution_id': institution_id,
+                    'name': institution_name
+                })
+
+        for account in accounts_response['accounts']:
+            account_institution_id = getattr(account, 'institution_id', institution_id)
+
+            if not account_institution_id:
+                logging.warning(f"Institution ID missing for account {account['account_id']}")
+                account_institution_id = str(uuid.uuid4())
+
+                institution = Institution.query.filter_by(name='Unknown Institution', user_id=user.id).first()
+                if not institution:
+                    institution = Institution(
+                        name='Unknown Institution',
+                        institution_id=account_institution_id,
+                        user_id=user.id
+                    )
+                    db.session.add(institution)
+                    db.session.flush()
+            else:
+                logging.info(f"Fetching institution details for account institution ID: {account_institution_id}")
+                institution_response = plaid_client.institutions_get_by_id(
+                    InstitutionsGetByIdRequest(
+                        institution_id=account_institution_id,
+                        country_codes=[CountryCode('US')]
+                    )
+                )
+                account_institution_name = institution_response.institution.name
+                logging.info(f"Institution name for account: {account_institution_name}")
+
+                institution = Institution.query.filter_by(institution_id=account_institution_id).first()
+                if not institution:
+                    institution = Institution(
+                        name=account_institution_name,
+                        institution_id=account_institution_id,
+                        user_id=user.id
+                    )
+                    db.session.add(institution)
+                    db.session.flush()
+
+                if not any(inst['institution_id'] == account_institution_id for inst in institutions):
+                    institutions.append({
+                        'institution_id': account_institution_id,
+                        'name': account_institution_name
+                    })
+
+            account_type = str(account['subtype']) if account['subtype'] else 'unknown'
+            balance = account['balances']['current'] if account['balances']['current'] else 0.0
+
+            existing_account = Account.query.filter_by(account_id=account['account_id']).first()
+            if existing_account:
+                existing_account.balance = balance
+                existing_account.name = account['name']
+                existing_account.type = account_type
+                existing_account.institution_id = institution.id
+            else:
+                account_model = Account(
+                    account_id=account['account_id'],
+                    balance=balance,
+                    name=account['name'],
+                    type=account_type,
+                    user_id=user.id,
+                    institution_id=institution.id
+                )
+                db.session.add(account_model)
+
+            accounts.append({
+                'account_id': account['account_id'],
+                'name': account['name'],
+                'type': account_type,
+                'balance': balance,
+                'institution_name': institution.name
+            })
+
+        db.session.commit()
+
+        return jsonify({
+            'status': 'success',
+            'institutions': institutions,
+            'accounts': accounts
+        })
+
+    except Exception as e:
+        logging.error(f"Error refreshing accounts: {str(e)}")
+        logging.error(traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
+
+
+

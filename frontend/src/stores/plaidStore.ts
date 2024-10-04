@@ -15,6 +15,7 @@ interface PlaidStore {
   setAccounts: (accounts: Account[]) => void;
   clearPlaidData: () => void;
   fetchPlaidData: (userId: string) => Promise<void>;
+  refreshAccounts: (userId: string) => Promise<void>;
 }
 
 export const usePlaidStore = create<PlaidStore>()(
@@ -28,7 +29,7 @@ export const usePlaidStore = create<PlaidStore>()(
 
       fetchPlaidData: async (userId) => {
         try {
-          const response = await fetch('/api/plaid/fetch_accounts', {
+          const checkResponse = await fetch('/api/plaid/check_accounts', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -36,17 +37,76 @@ export const usePlaidStore = create<PlaidStore>()(
             body: JSON.stringify({ user_id: userId }),
           });
 
-          if (!response.ok) {
-            throw new Error('Failed to fetch accounts from Plaid');
+          if (!checkResponse.ok) {
+            throw new Error('Failed to check accounts in the database');
           }
 
-          const data = await response.json();
-          console.log('data: ', data);
-          set({ institutions: data.institutions });
-          set({ accounts: data.accounts });
+          const checkData = await checkResponse.json();
+
+          if (checkData.hasAccounts) {
+            const refreshResponse = await fetch('/api/plaid/refresh_accounts', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ user_id: userId }),
+            });
+
+            if (!refreshResponse.ok) {
+              throw new Error('Failed to refresh accounts from Plaid');
+            }
+
+            const refreshData = await refreshResponse.json();
+            set({ institutions: refreshData.institutions });
+            set({ accounts: refreshData.accounts });
+          } else {
+            const newResponse = await fetch('/api/plaid/fetch_accounts', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ user_id: userId }),
+            });
+
+            if (!newResponse.ok) {
+              throw new Error('Failed to fetch new accounts from Plaid');
+            }
+
+            const newData = await newResponse.json();
+            set({ institutions: newData.institutions });
+            set({ accounts: newData.accounts });
+          }
 
         } catch (error) {
           console.error('Error fetching accounts:', error);
+        }
+      },
+
+      refreshAccounts: async (userId: string) => {
+        try {
+
+          set(() => ({
+            institutions: [],
+            accounts: [],
+          }))
+          
+          const refreshResponse = await fetch('/api/plaid/refresh_accounts', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ user_id: userId }),
+          });
+
+          if (!refreshResponse.ok) {
+            throw new Error('Failed to refresh accounts from Plaid');
+          }
+
+          const refreshData = await refreshResponse.json();
+          set({ institutions: refreshData.institutions });
+          set({ accounts: refreshData.accounts });
+        } catch (error) {
+          console.error('Error refreshing accounts:', error);
         }
       },
     }),

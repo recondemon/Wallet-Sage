@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../lib/firebase/firebase';
 import { useUserStore } from '../../stores/userStore';
+import { usePlaidStore } from '../../stores/plaidStore';
 
 interface LoginProps {
   onClose: () => void;
@@ -46,7 +47,12 @@ const Login: React.FC<LoginProps> = ({ onClose }) => {
         lastName: userData.lastName,
         dob: userData.dob,
       });
-  
+      
+      const refreshAccounts = usePlaidStore((state) => state.refreshAccounts);
+      await refreshAccounts(firebaseUser.uid);
+
+      console.log('Login successful');
+
       onClose();
   
     } catch (error) {

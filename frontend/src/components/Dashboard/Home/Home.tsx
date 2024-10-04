@@ -20,12 +20,6 @@ const Home = () => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if(!currentUser) {
         navigate('/');
-      } else {
-        if(user && user.uid){
-          fetchPlaidData(user.uid)
-          console.log('fetching plaid data')
-          console.log('accounts: ', accounts)
-        }
       }
     })
 
