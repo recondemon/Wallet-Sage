@@ -8,6 +8,7 @@ import MainContent from './MainContent'
 import Credit from './Credit'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom';
+import Envelopes from './Envelopes/Envelopes'
 
 const Home = () => {
   const accounts = usePlaidStore(state => state.accounts);
@@ -28,22 +29,16 @@ const Home = () => {
   }, [auth, user, accounts, navigate, fetchPlaidData, user?.uid])
 
   return (
-    <div className='flex flex-col p-4 m-4 rounded-lg justify-center items-center w-[80vw] h-[95vh] mx-auto gap-4'>
-      <div className='flex flex-col'>
-
+    <div className='flex rounded-lg justify-between items-center w-full h-screen gap-4'>
+      <div className='flex flex-col w-[20vw] h-full'>
+        <SaveGoal />          
+        <Envelopes />
       </div>
-      {/* top row (Balance info, Savings Goal, Credit info) */}
-      <div className='flex w-full h-[30vh] gap-4'>
-        <div className='flex gap-4 w-2/3'>
-          <Balance />
-          <SaveGoal />          
-        </div>
-        <div className='flex w-1/3'>
-          <Credit />
-        </div>
-      </div>
-      <div className='flex w-full h-[60vh]'>
+      <div className='flex flex-col gap-4 w-[50vw] h-full'>
         <MainContent />
+      </div>
+      <div className='flex flex-col w-[20vw] h-full border-l-2 bg-card'>
+        <Balance />
         <Accounts accounts={accounts}/>
       </div>
     </div>

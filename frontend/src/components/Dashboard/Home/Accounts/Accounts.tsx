@@ -32,7 +32,7 @@ const Accounts: React.FC<AccountsProps> = ({accounts}) => {
     }
 
   return (
-    <div className='flex flex-col p-4 border-2 w-1/3 rounded-lg bg-card'>
+    <div className='flex flex-col p-4 w-full rounded-lg '>
         <div className='flex gap-2 justify-between pb-2'>
             <div
             onClick={handleRefresh}

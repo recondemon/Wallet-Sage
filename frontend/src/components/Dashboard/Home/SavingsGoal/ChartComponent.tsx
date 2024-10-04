@@ -32,7 +32,6 @@ const ChartComponent: React.FC<ChartProps> = ({ goal }) => {
           borderWidth: 1,
         },
       ],
-      labels: ['Remaining', 'Saved'],
     }),
     [balance, remaining]
   );
