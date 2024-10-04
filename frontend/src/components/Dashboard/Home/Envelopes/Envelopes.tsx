@@ -1,9 +1,7 @@
-import React from 'react'
+import React from 'react';
 
 const Envelopes = () => {
-  return (
-    <div>Envelopes</div>
-  )
-}
+  return <div>Envelopes</div>;
+};
 
-export default Envelopes
+export default Envelopes;

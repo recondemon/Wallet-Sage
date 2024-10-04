@@ -9,13 +9,13 @@ export default defineConfig({
         target: 'http://localhost:5000',
         changeOrigin: true,
         secure: false,
-    }
-    }
+      },
+    },
   },
   resolve: {
     extensions: ['.js', '.ts', '.jsx', '.tsx'],
   },
   css: {
     postcss: './postcss.config.js',
-  }
+  },
 });

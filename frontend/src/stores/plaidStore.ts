@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { Account } from '../lib/types/AccountTypes';
 
-
 interface Institution {
   institution_id: string;
   name: string;
@@ -76,7 +75,6 @@ export const usePlaidStore = create<PlaidStore>()(
             set({ institutions: newData.institutions });
             set({ accounts: newData.accounts });
           }
-
         } catch (error) {
           console.error('Error fetching accounts:', error);
         }
@@ -84,12 +82,11 @@ export const usePlaidStore = create<PlaidStore>()(
 
       refreshAccounts: async (userId: string) => {
         try {
-
           set(() => ({
             institutions: [],
             accounts: [],
-          }))
-          
+          }));
+
           const refreshResponse = await fetch('/api/plaid/refresh_accounts', {
             method: 'POST',
             headers: {

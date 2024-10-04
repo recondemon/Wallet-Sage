@@ -12,7 +12,7 @@ const Modal: React.FC<ModalProps> = ({ onClose, children }) => {
       <div className="bg-card rounded-lg shadow-lg p-6 relative">
         {children}
         <button
-          title='Close Modal'
+          title="Close Modal"
           className="absolute p-0 m-0 top-1 right-1 text-foreground text-1vw hover:text-destructive"
           onClick={onClose}
         >

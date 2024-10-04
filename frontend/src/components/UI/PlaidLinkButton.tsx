@@ -1,10 +1,10 @@
 import { usePlaidLink } from 'react-plaid-link';
 import { useEffect, useState } from 'react';
-import { usePlaidStore } from '../../stores/plaidStore'
+import { usePlaidStore } from '../../stores/plaidStore';
 
 interface PlaidLinkButtonProps {
-    userId: string | undefined;
-    }
+  userId: string | undefined;
+}
 
 export const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({ userId }) => {
   const [linkToken, setLinkToken] = useState(null);
@@ -40,43 +40,42 @@ export const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({ userId }) => {
     });
 
     const accountsResponse = await fetch('/api/plaid/fetch_accounts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          user_id: userId,
-        }),
-      });
-  
-      const accountsData = await accountsResponse.json();
-  
-      setInstitutions(accountsData.institutions);
-      setAccounts(accountsData.accounts);
-    };
-  
-    const config = {
-      token: linkToken,
-      onSuccess,
-    };
-  
-    const { open, ready } = usePlaidLink({
-      token: linkToken,
-      onSuccess,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user_id: userId,
+      }),
     });
-  
-    if (!linkToken) {
-      return <div>Loading...</div>;
-    }
-  
-    return (
-        <button 
-        onClick={() => open()} 
-        disabled={!ready}
-        className='p-2 hover:cursor-pointer hover:bg-muted rounded-lg'        
-        >
-            Connect Bank
-        </button>
-    ) 
-        
+
+    const accountsData = await accountsResponse.json();
+
+    setInstitutions(accountsData.institutions);
+    setAccounts(accountsData.accounts);
   };
+
+  const config = {
+    token: linkToken,
+    onSuccess,
+  };
+
+  const { open, ready } = usePlaidLink({
+    token: linkToken,
+    onSuccess,
+  });
+
+  if (!linkToken) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <button
+      onClick={() => open()}
+      disabled={!ready}
+      className="p-2 hover:cursor-pointer hover:bg-muted rounded-lg"
+    >
+      Connect Bank
+    </button>
+  );
+};

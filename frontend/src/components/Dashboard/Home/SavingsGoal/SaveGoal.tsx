@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Chart from './ChartComponent';
 import ChartComponent from './ChartComponent';
@@ -8,10 +7,9 @@ import { ArrowLeft, ArrowRight, Plus } from 'lucide-react';
 import UniversalModal from '../../../Modals/UniversalModal';
 import NewSavingsGoal from './NewSavingsGoal';
 
-
 const SaveGoal = () => {
   //* Stores
-  const savingsGoals = useSavingsGoalStore(state => state.savingsGoals);
+  const savingsGoals = useSavingsGoalStore((state) => state.savingsGoals);
 
   //* Modal State
   const [isOpen, setIsOpen] = React.useState(false);
@@ -20,7 +18,7 @@ const SaveGoal = () => {
 
   const handleOpenNewGoal = () => {
     setIsOpen(true);
-  }
+  };
 
   //* Navigate between goals
   const handlePreviousGoal = () => {
@@ -45,20 +43,20 @@ const SaveGoal = () => {
     return <p>No savings goals available.</p>;
   }
 
-  const currentGoal = savingsGoals[selectedGoalIndex]; 
+  const currentGoal = savingsGoals[selectedGoalIndex];
 
   return (
     <div className="flex flex-col p-4 w-full rounded-lg ">
-      <div className='flex justify-between w-full mb-4'>
-        <h1 className='text-xl font-bold'>Savings Goals</h1>
+      <div className="flex justify-between w-full mb-4">
+        <h1 className="text-xl font-bold">Savings Goals</h1>
         <div onClick={handleOpenNewGoal}>
-          <Plus className='w-6 h-6 ml-2' />
+          <Plus className="w-6 h-6 ml-2" />
         </div>
       </div>
-      <div className='flex flex-col gap-4'>
+      <div className="flex flex-col gap-4">
         <div
-        className="flex w-full p-4 bg-card rounded-lg hover:bg-altBackground hover:cursor-pointer transition duration-300"
-        onClick={handleOpenGoalModal}
+          className="flex w-full p-4 bg-card rounded-lg hover:bg-altBackground hover:cursor-pointer transition duration-300"
+          onClick={handleOpenGoalModal}
         >
           <div className="w-1/2 h-full">
             <ChartComponent goal={currentGoal} />
@@ -67,18 +65,18 @@ const SaveGoal = () => {
             <GoalDetails goal={currentGoal} />
           </div>
         </div>
-        <div className='flex justify-between'>
-          <ArrowLeft 
-          className="w-6 h-6 hover:cursor-pointer" 
-          onClick={handlePreviousGoal} 
+        <div className="flex justify-between">
+          <ArrowLeft
+            className="w-6 h-6 hover:cursor-pointer"
+            onClick={handlePreviousGoal}
           />
-          <ArrowRight 
-          className="w-6 h-6 hover:cursor-pointer" 
-          onClick={handleNextGoal}
+          <ArrowRight
+            className="w-6 h-6 hover:cursor-pointer"
+            onClick={handleNextGoal}
           />
         </div>
       </div>
-      { isOpen && (
+      {isOpen && (
         <UniversalModal onClose={() => setIsOpen(false)}>
           <NewSavingsGoal />
         </UniversalModal>
