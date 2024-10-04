@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Account } from "../../../../lib/types/AccountTypes";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 //! TODO: Add type safety, adjust styling, and add expandable logic to AccountsList component
 
@@ -13,6 +14,7 @@ interface GroupedAccounts {
 
 const AccountsList: React.FC<AccountListProps> = ({ accounts }) => {
   const [groupedAccounts, setGroupedAccounts] = useState<GroupedAccounts>({});
+  const [isExpaned, setIsExpanded] = useState(false);
 
   useEffect(() => {
     const grouped = accounts.reduce<GroupedAccounts>((result, account) => {
@@ -26,14 +28,24 @@ const AccountsList: React.FC<AccountListProps> = ({ accounts }) => {
     setGroupedAccounts(grouped);
   }, [accounts]);
 
+  
+
   return (
     <div>
-      {/*//! TODO: Create Drop Downs for each institution -> list ALL accounts linked by that institution when expanded, add total balance per institution to right of institution name */}
       {Object.keys(groupedAccounts).map((institution_name) => (
         <div key={institution_name} style={{ marginBottom: '20px' }}>
-          <h2 className="text-1vw font-semi-bold mt-2">{institution_name}</h2>
+          {/* Insitution Name */}
+          <div className="flex gap-2 items-center">
+            <h2 
+            className="text-1vw font-semi-bold mt-2">
+              {institution_name}
+            </h2>
+            {/* //! Implement expanded logic here! */}
+            <div className="flex justify-center items-center">
+              {isExpaned ? <ChevronUp /> : <ChevronDown />}
+            </div>
+          </div>
           <ul>
-            {/*//! TODO: add expanded / not expanded logic */}
             {groupedAccounts[institution_name].map((account) => (
               <li key={account.account_id}>
                 <div className="grid grid-cols-3 w-full">

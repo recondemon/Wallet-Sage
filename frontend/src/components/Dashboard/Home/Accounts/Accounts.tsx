@@ -7,6 +7,7 @@ import { Account } from '../../../../lib/types/AccountTypes'
 import { ArrowLeftRight, MoreHorizontal, RefreshCcw, Settings } from 'lucide-react';
 import Dropdown from '../../../UI/DropDown'
 import { useSavingsGoalStore } from '../../../../stores/savingsGoalStore';
+import Balance from './Balance';
 interface AccountsProps {
     accounts: Account[]
 }
@@ -32,28 +33,34 @@ const Accounts: React.FC<AccountsProps> = ({accounts}) => {
     }
 
   return (
-    <div className='flex flex-col p-4 w-full rounded-lg '>
+    <div className='flex flex-col p-4 w-full rounded-lg pt-8'>
         <div className='flex gap-2 justify-between pb-2'>
             <div
             onClick={handleRefresh}
+            className='hover:cursor-pointer hover:text-primary transition duration-300'
             >
                 <RefreshCcw />
             </div>
-            <div className='flex justify-center items-center gap-2'>
+            <div className='hover:cursor-pointer hover:text-primary transition duration-300'>
                 <ArrowLeftRight />
-                <p>
-                    Transfer Money
-                </p>
             </div>
-            <Dropdown buttonContent={<MoreHorizontal />}>
+            <Dropdown buttonContent={
+                <MoreHorizontal 
+                className='hover:text-primary transition duration-300 hover:cursor-pointer'
+                size={30}
+                />
+            }>
                 <PlaidLinkButton userId={user?.uid}/>
                 <button className='p-2 hover:cursor-pointer hover:bg-muted rounded-lg '>
                     Manage Accounts
                 </button>
             </Dropdown>
         </div>
+        <div className='my-4'>
+            <Balance />
+        </div>
         <div className='flex justify-center py-1 border-b'>
-            <h2 className='text-1vw'>
+            <h2 className='text-1.vw'>
                 Accounts
             </h2>
         </div>

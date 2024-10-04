@@ -1,9 +1,17 @@
 import React from 'react'
+import Transactions from './Transactions/Transactions'
+import SaveGoal from './SavingsGoal/SaveGoal'
+import Envelopes from './Envelopes/Envelopes'
 
 const MainContent = () => {
   return (
-    <div className='flex w-full bg-card border-2 rounded-lg mr-4 justify-center items-center'>
-        <p className='text-2vw'>Main Content Will Go Here</p>
+    <div className='flex flex-col w-full rounded-lg justify-center items-center'>
+
+        <div className='flex'>
+          <SaveGoal />
+          <Envelopes />
+        </div>
+        <Transactions />
     </div>
   )
 }

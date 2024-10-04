@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { usePlaidStore } from '../../../stores/plaidStore'
+import { usePlaidStore } from '../../../../stores/plaidStore'
 import { ChevronDown , ChevronUp } from 'lucide-react'
 
 const Balance = () => {
@@ -50,14 +50,14 @@ const Balance = () => {
     , [accounts, institutions])
 
   return (
-    <div className='flex flex-col p-4  w-full rounded-lg'>
+    <div className='flex flex-col p-4  w-full rounded-lg bg-altBackground rounded-lg'>
         <div className='flex flex-col'>
             <p className='text-3vw text-center my-0 py-0'>
                 ${totalBalance}
             </p>
         </div>
         <div className='flex flex-col gap-2 mt-2'>
-            <div className='flex justify-between gap-2 p-2 border-b'>
+            <div className='flex justify-between gap-2'>
                 <div 
                 className='flex justify-between gap-2 hover:cursor-pointer'
                 onClick={() => setCheckingExpanded(!checkingExpanded)}
@@ -65,17 +65,12 @@ const Balance = () => {
                     <p className='text-1vw'>
                         Checking
                     </p>
-                    {checkingExpanded ? (
-                        <ChevronUp size={24} />  
-                    ) : (
-                        <ChevronDown size={24} />
-                    )}
                 </div>
                 <p>
                     ${totalChecking}
                 </p>
             </div>
-            <div className='flex justify-between gap-2 p-2 border-b'>
+            <div className='flex justify-between gap-2'>
                 <div
                 className='flex justify-between gap-2 hover:cursor-pointer'
                 onClick={() => setSavingsExpanded(!savingsExpanded)}
@@ -83,17 +78,12 @@ const Balance = () => {
                     <p className='text-1vw'>
                         Savings
                     </p>
-                    {savingsExpanded ? (
-                        <ChevronUp size={24} />  
-                    ) : (
-                        <ChevronDown size={24} />
-                    )}
                 </div>
                 <p>
                     ${totalSavings}
                 </p>
             </div>
-            <div className='flex justify-between gap-2 p-2 border-b'>
+            <div className='flex justify-between gap-2'>
                 <div
                 className='flex justify-between gap-2 hover:cursor-pointer'
                 onClick={() => setInvestmentsExpanded(!investmentsExpanded)}
@@ -101,11 +91,6 @@ const Balance = () => {
                     <p>
                         Investments
                     </p>
-                    {investmentsExpanded ? (
-                        <ChevronUp size={24} />  
-                    ) : (
-                        <ChevronDown size={24} />
-                    )}
                 </div>
                 <p>
                     ${totalInvestments}
