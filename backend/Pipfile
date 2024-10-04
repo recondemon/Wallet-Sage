@@ -15,6 +15,8 @@ python-dotenv = "*"
 plaid = "*"
 plaid-python = "*"
 flask-sqlalchemy-stubs = "*"
+gunicorn = "*"
+waitress = "*"
 
 [dev-packages]
 
