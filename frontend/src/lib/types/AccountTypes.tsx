@@ -4,6 +4,7 @@ export interface Account {
     type: string;
     institution_name: string;
     balance: number;
+    id: string;
     }
 
 export interface Institution {

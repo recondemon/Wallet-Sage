@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import Balance from './Balance'
 import Accounts from './Accounts/Accounts'
-import SaveGoal from './SaveGoal'
+import SaveGoal from './SavingsGoal/SaveGoal'
 import { usePlaidStore } from '../../../stores/plaidStore'
 import { User, useUserStore } from '../../../stores/userStore'
 import MainContent from './MainContent'

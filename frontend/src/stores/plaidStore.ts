@@ -1,13 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { Account } from '../lib/types/AccountTypes';
 
-interface Account {
-  account_id: string;
-  name: string;
-  type: string;
-  institution_name: string;
-  balance: number;
-}
 
 interface Institution {
   institution_id: string;
