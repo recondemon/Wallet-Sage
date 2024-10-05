@@ -46,9 +46,9 @@ const SaveGoal = () => {
   const currentGoal = savingsGoals[selectedGoalIndex];
 
   return (
-    <div className="flex flex-col p-4 w-full rounded-lg ">
+    <div className="flex flex-col p-4 min-w-[20vw] w-full rounded-lg ">
       <div className="flex justify-between w-full mb-4">
-        <h1 className="text-xl font-bold">Savings Goals</h1>
+        <h1 className="text-2vw font-semibold">Savings Goals</h1>
         <div onClick={handleOpenNewGoal}>
           <Plus className="w-6 h-6 ml-2" />
         </div>

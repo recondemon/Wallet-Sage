@@ -6,7 +6,7 @@ import Envelopes from './Envelopes/Envelopes';
 const MainContent = () => {
   return (
     <div className="flex flex-col w-full rounded-lg justify-center items-center">
-      <div className="flex">
+      <div className="flex gap-4">
         <SaveGoal />
         <Envelopes />
       </div>
