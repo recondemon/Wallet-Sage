@@ -5,6 +5,7 @@ import NewEnvelope from "./NewEnvelope";
 import { useEnvelopesStore } from "../../../../stores/envelopeStore";
 import EnvelopeItem from "./EnvelopeItem";
 import { useUserStore } from "../../../../stores/userStore";
+import EnvelopeDetails from "./EnvelopeDetails";
 
 const NoEnvelopesPlaceholder = ({ onCreateEnvelope }) => {
   return (
@@ -18,7 +19,6 @@ const NoEnvelopesPlaceholder = ({ onCreateEnvelope }) => {
         <div className="w-1/2 h-4 bg-gray-200 rounded-md mb-2 animate-pulse"></div>
       </div>
       <div className="w-1/2 px-4 flex flex-col justify-center">
-        {/* Placeholder for Envelope Details */}
         <div className="w-full h-6 bg-gray-200 rounded-md mb-4 animate-pulse"></div>
         <div className="w-2/3 h-4 bg-gray-200 rounded-md mb-2 animate-pulse"></div>
         <div className="w-1/2 h-4 bg-gray-200 rounded-md mb-2 animate-pulse"></div>
@@ -42,6 +42,8 @@ const Envelopes = () => {
   const user = useUserStore((state) => state.user);
 
   const [isOpen, setIsOpen] = useState(false);
+  const [openEnvelope, setOpenEnvelope] = useState(false);
+  const [envelopeView, setEnvelopeView] = useState(null);
 
   useEffect(() => {
     if(user){
@@ -52,6 +54,11 @@ const Envelopes = () => {
 
   const handleOpenNewEnvelope = () => {
     setIsOpen(true);
+  };
+
+  const handleOpenEnvelope = (envelope) => {
+    setOpenEnvelope(true);
+    setEnvelopeView(envelope);
   };
 
   // If no envelopes exist, display the placeholder and button
@@ -69,7 +76,7 @@ const Envelopes = () => {
         <NoEnvelopesPlaceholder onCreateEnvelope={handleOpenNewEnvelope} />
         {isOpen && (
           <UniversalModal onClose={() => setIsOpen(false)}>
-            <NewEnvelope />
+            <NewEnvelope setIsOpen={setIsOpen} /> 
           </UniversalModal>
         )}
       </div>
@@ -88,14 +95,23 @@ const Envelopes = () => {
       </div>
       <div className='grid grid-cols-2 gap-2 bg-card rounded-lg h-full'>
         {envelopes.map((envelope) => (
-          <div key={envelope.id} className='flex flex-col gap-2 p-4'>
+          <div 
+          key={envelope.id} 
+          className='flex flex-col gap-2 p-4 hover:bg-altBackground hover:cursor-pointer hover:text-primary rounded-lg transition duration-300'
+          onClick={() => handleOpenEnvelope(envelope)}
+          >
             <EnvelopeItem envelope={envelope} />
           </div>
         ))}
       </div>
       {isOpen && (
           <UniversalModal onClose={() => setIsOpen(false)}>
-            <NewEnvelope />
+            <NewEnvelope setIsOpen={setIsOpen}/>
+          </UniversalModal>
+        )}
+        {openEnvelope && (
+          <UniversalModal onClose={() => setOpenEnvelope(false)}>
+            <EnvelopeDetails envelope={envelopeView} />
           </UniversalModal>
         )}
     </div>

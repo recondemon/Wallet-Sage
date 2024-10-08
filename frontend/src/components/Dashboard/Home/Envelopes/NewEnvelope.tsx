@@ -2,11 +2,17 @@ import React from 'react'
 import { useEnvelopesStore } from '../../../../stores/envelopeStore'
 import { useUserStore } from '../../../../stores/userStore'
 
-const NewEnvelope = () => {
+interface NewEnvelopeProps {
+    setIsOpen: (value: boolean) => void
+}
+
+const NewEnvelope: React.FC<NewEnvelopeProps> = ({setIsOpen }) => {
     //# Stores
     const user = useUserStore(state => state.user)
     const envelopesStore = useEnvelopesStore()
     const { saveEnvelope } = envelopesStore
+    const { addEnvelope } = envelopesStore
+
     //* states
     const [name, setName] = React.useState<string>('')
     const [limit, setLimit] = React.useState<number>(0)
@@ -18,7 +24,7 @@ const NewEnvelope = () => {
     const handleSubmit = async (e) => {
         e.preventDefault()
 
-        const NewEnvelope = {
+        const newEnvelope = {
             name,
             limit,
             balance,
@@ -27,12 +33,19 @@ const NewEnvelope = () => {
             user_id: user?.uid
         }
 
-        await saveEnvelope(NewEnvelope)
+        const savedEnvelope = await saveEnvelope(newEnvelope); 
+        if (savedEnvelope) {
+            envelopesStore.addEnvelope(savedEnvelope);
 
-        setName('')
-        setDescription('')
-        setLimit(0)
-        setBalance(0)
+            setName('');
+            setDescription('');
+            setLimit(0);
+            setBalance(0);
+
+            setIsOpen(false);
+        } else {
+            setErrors('Failed to create envelope');
+        }
     }
 
   return (
