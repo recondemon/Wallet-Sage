@@ -14,3 +14,14 @@ class Envelope(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     user = db.relationship('User', backref='envelopes', lazy=True)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'limit': self.limit,
+            'balance': self.balance,
+            'created_at': self.created_at.isoformat(),
+            'user_id': self.user_id
+        }

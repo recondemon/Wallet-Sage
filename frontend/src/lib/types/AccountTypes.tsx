@@ -21,3 +21,12 @@ export interface SavingsGoal {
   accounts: string[];
   userId: string;
 }
+
+export interface Envelope {
+  id: string;
+  name: string;
+  goal: number;
+  balance: number;
+  description?: string;
+  userId: string;
+}

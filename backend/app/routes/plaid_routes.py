@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from app.models import User, Account, Institution, Balance
 from .. import db
 from plaid.model.link_token_create_request import LinkTokenCreateRequest
+from plaid.model.link_token_create_request_user import LinkTokenCreateRequestUser
 from plaid.model.country_code import CountryCode
 from plaid.model.products import Products
 from plaid.model.item_public_token_exchange_request import ItemPublicTokenExchangeRequest
@@ -14,6 +15,7 @@ from enum import Enum as PyEnum
 import traceback
 import logging
 import uuid
+import plaid
 
 
 class AccountSubtype(Enum):
@@ -42,10 +44,10 @@ def create_link_token():
         logging.error(f"User not found for UID: {user_uid}")
         return jsonify({"error": "User not found"}), 404
 
+    link_token_user = LinkTokenCreateRequestUser(client_user_id=str(user_uid))
+
     request_data = LinkTokenCreateRequest(
-        user={
-            'client_user_id': str(user_uid),
-        },
+        user=link_token_user,
         client_name='Wallet Sage',
         products=[Products('auth'), Products('transactions')],
         country_codes=[CountryCode('US')],
@@ -66,7 +68,7 @@ def exchange_public_token():
     public_token = request.json.get('public_token')
     user_uid = request.json.get('user_id')
 
-    logging.info(f"Exchanging public token for user: {user_uid}")
+    logging.info(f"Received public token: {public_token} for user: {user_uid}")
 
     user = User.query.filter_by(uid=user_uid).first()
     if user is None:
@@ -77,7 +79,8 @@ def exchange_public_token():
         exchange_response = plaid_client.item_public_token_exchange(ItemPublicTokenExchangeRequest(public_token=public_token))
         access_token = exchange_response['access_token']
         logging.info(f"Public token exchanged for access token for user {user_uid}")
-
+        available_products = exchange_response.get('available_products', [])
+        logging.info(f"Available products in exchanged token: {available_products}")
         user.plaid_access_token = access_token
         db.session.commit()
 
@@ -113,7 +116,18 @@ def fetch_accounts():
 
     try:
         logging.info(f"Fetching accounts from Plaid with access token: {access_token}")
-        accounts_response = plaid_client.accounts_get(AccountsGetRequest(access_token=access_token))
+
+        # Constructing the correct AccountsGetRequest object
+        accounts_request = AccountsGetRequest(access_token=access_token)
+        logging.info(f"Accounts request being sent: {accounts_request}")
+
+        # Fetching the accounts from Plaid using the valid request
+        accounts_response = plaid_client.accounts_get(accounts_request)
+
+        # Check for invalid products in the response
+        if 'signal' in accounts_response.get('available_products', []):
+            logging.error("Invalid product 'signal' found in the available products.")
+            return jsonify({"error": "Invalid product 'signal' found in available products."}), 400
 
         logging.info(f"Plaid accounts response: {accounts_response}")
 
@@ -125,6 +139,7 @@ def fetch_accounts():
 
         if institution_id:
             logging.info(f"Fetching institution details for ID: {institution_id}")
+
             institution_response = plaid_client.institutions_get_by_id(
                 InstitutionsGetByIdRequest(
                     institution_id=institution_id, 
@@ -149,7 +164,6 @@ def fetch_accounts():
                     'institution_id': institution_id,
                     'name': institution_name
                 })
-
 
         for account in accounts_response['accounts']:
             account_institution_id = getattr(account, 'institution_id', institution_id)
@@ -230,10 +244,14 @@ def fetch_accounts():
             'accounts': accounts
         })
 
+    except plaid.ApiException as e:
+        logging.error(f"Plaid API error: {str(e)}")
+        return jsonify({"error": f"Plaid API error: {str(e)}"}), 500
     except Exception as e:
         logging.error(f"Error fetching accounts: {str(e)}")
         logging.error(traceback.format_exc())
         return jsonify({"error": str(e)}), 500
+
 
 
 

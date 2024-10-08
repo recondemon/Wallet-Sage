@@ -8,6 +8,7 @@ from plaid.model import *
 from plaid.configuration import Configuration
 from plaid.api_client import ApiClient
 import logging
+from app.commands import register_commands
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -31,7 +32,9 @@ def create_app():
 
     db.init_app(app)
     migrate.init_app(app, db)
-    CORS(app)
+    CORS(app, resources={r"/api/*": {"origins": "*"}}) 
+
+    register_commands(app)
 
     configure_logging(app)
 
