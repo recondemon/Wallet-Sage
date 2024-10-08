@@ -29,4 +29,6 @@ export interface Envelope {
   balance: number;
   description?: string;
   userId: string;
+  limit: number;
+  user_id: string;
 }

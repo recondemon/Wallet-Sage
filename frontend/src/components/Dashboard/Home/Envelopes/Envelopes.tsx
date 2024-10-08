@@ -1,7 +1,10 @@
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import UniversalModal from "../../../Modals/UniversalModal";
 import NewEnvelope from "./NewEnvelope";
+import { useEnvelopesStore } from "../../../../stores/envelopeStore";
+import EnvelopeItem from "./EnvelopeItem";
+import { useUserStore } from "../../../../stores/userStore";
 
 const NoEnvelopesPlaceholder = ({ onCreateEnvelope }) => {
   return (
@@ -33,8 +36,19 @@ const NoEnvelopesPlaceholder = ({ onCreateEnvelope }) => {
 };
 
 const Envelopes = () => {
+  //# Stores
+  const envelopes = useEnvelopesStore((state) => state.envelopes);
+  const getEnvelopes = useEnvelopesStore((state) => state.getEnvelopes);
+  const user = useUserStore((state) => state.user);
+
   const [isOpen, setIsOpen] = useState(false);
-  const [envelopes, setEnvelopes] = useState([]);  // Placeholder for envelopes state
+
+  useEffect(() => {
+    if(user){
+      getEnvelopes(user.uid);
+    }
+  }, [user]); 
+
 
   const handleOpenNewEnvelope = () => {
     setIsOpen(true);
@@ -48,8 +62,8 @@ const Envelopes = () => {
           <h1 className='text-2vw font-semibold'>
             Envelopes
           </h1>
-          <div onClick={handleOpenNewEnvelope}>
-            <Plus className="w-6 h-6 ml-2" />
+          <div onClick={handleOpenNewEnvelope} className="flex justify-center items-center"> 
+            <Plus className="w-6 h-6 ml-2 hover:cursor-pointer hover:text-primary" />
           </div>
         </div>
         <NoEnvelopesPlaceholder onCreateEnvelope={handleOpenNewEnvelope} />
@@ -63,15 +77,27 @@ const Envelopes = () => {
   }
 
   return(
-    <div className='flex flex-col p-4 min-w-[30vw] w-full rounded-lg'>
-      <div className="flex justify-between">
+    <div className='flex flex-col p-4 min-w-[30vw] min-h-[30vh] w-full rounded-lg'>
+      <div className="flex justify-between mb-4">
         <h1 className='text-2vw font-semibold'>
           Envelopes
         </h1>
+        <div onClick={handleOpenNewEnvelope} className="flex justify-center items-center">
+            <Plus className="w-6 h-6 ml-2 h-10 w-10 hover:cursor-pointer hover:text-primary" />
+        </div>
       </div>
-      <div className='grid grid-cols-2 gap-2 border border-border rounded-lg'>
-
+      <div className='grid grid-cols-2 gap-2 bg-card rounded-lg h-full'>
+        {envelopes.map((envelope) => (
+          <div key={envelope.id} className='flex flex-col gap-2 p-4'>
+            <EnvelopeItem envelope={envelope} />
+          </div>
+        ))}
       </div>
+      {isOpen && (
+          <UniversalModal onClose={() => setIsOpen(false)}>
+            <NewEnvelope />
+          </UniversalModal>
+        )}
     </div>
   )
   

@@ -42,10 +42,12 @@ def create_app():
         from app.routes.user_routes import user_bp
         from app.routes.plaid_routes import plaid_bp
         from app.routes.savings_goal_routes import savings_goal_bp
+        from app.routes.envelope_routes import envelope_bp
         
         app.register_blueprint(user_bp, url_prefix='/api/users')
         app.register_blueprint(plaid_bp, url_prefix='/api/plaid')
         app.register_blueprint(savings_goal_bp, url_prefix='/api/savingsgoals')
+        app.register_blueprint(envelope_bp, url_prefix='/api/envelope')
     return app
 
 def configure_logging(app):

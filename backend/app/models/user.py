@@ -15,3 +15,5 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     institutions = db.relationship('Institution', backref='user', lazy=True)
+
+    user_envelopes = db.relationship('Envelope', backref='user', lazy=True)

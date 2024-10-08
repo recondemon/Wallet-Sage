@@ -3,7 +3,7 @@ import Chart from './ChartComponent';
 import ChartComponent from './ChartComponent';
 import { useSavingsGoalStore } from '../../../../stores/savingsGoalStore';
 import GoalDetails from './GoalDetails';
-import { ArrowLeft, ArrowRight, Plus } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import UniversalModal from '../../../Modals/UniversalModal';
 import NewSavingsGoal from './NewSavingsGoal';
 
@@ -73,8 +73,8 @@ const SaveGoal = () => {
       <div className="flex flex-col p-4 min-w-[20vw] w-full h-[30vh] rounded-lg">
         <div className="flex justify-between w-full mb-4">
           <h1 className="text-2vw font-semibold">Savings Goals</h1>
-          <div onClick={handleOpenNewGoal}>
-            <Plus className="w-6 h-6 ml-2" />
+          <div onClick={handleOpenNewGoal} className='flex justify-center items-center'>
+            <Plus className="w-6 h-6 ml-2 hover:cursor-pointer hover:text-primary h-10 w-10" />
           </div>
         </div>
         <NoGoalsPlaceholder onCreateGoal={handleOpenNewGoal} />
@@ -90,16 +90,16 @@ const SaveGoal = () => {
   const currentGoal = savingsGoals[selectedGoalIndex];
 
   return (
-    <div className="flex flex-col p-4 min-w-[20vw] w-full rounded-lg ">
+    <div className="flex flex-col p-4 min-w-[20vw] min-h-[30vh] w-full rounded-lg ">
       <div className="flex justify-between w-full mb-4">
         <h1 className="text-2vw font-semibold">Savings Goals</h1>
-        <div onClick={handleOpenNewGoal}>
-          <Plus className="w-6 h-6 ml-2" />
+        <div onClick={handleOpenNewGoal} className='flex justify-center items-center'>
+          <Plus className="w-6 h-6 ml-2 hover:cursor-pointer hover:text-primary h-10 w-10" />
         </div>
       </div>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 bg-card rounded-lg p-4">
         <div
-          className="flex w-full p-4 bg-card rounded-lg hover:bg-altBackground hover:cursor-pointer transition duration-300"
+          className="flex w-full p-4 rounded-lg hover:bg-altBackground hover:cursor-pointer transition duration-300"
           onClick={handleOpenGoalModal}
         >
           <div className="w-1/2 h-full">
@@ -110,12 +110,12 @@ const SaveGoal = () => {
           </div>
         </div>
         <div className="flex justify-between">
-          <ArrowLeft
-            className="w-6 h-6 hover:cursor-pointer"
+          <ChevronLeft
+            className="w-10 h-10 hover:cursor-pointer hover:text-primary"
             onClick={handlePreviousGoal}
           />
-          <ArrowRight
-            className="w-6 h-6 hover:cursor-pointer"
+          <ChevronRight
+            className="w-10 h-10 hover:cursor-pointer hover:text-primary"
             onClick={handleNextGoal}
           />
         </div>

@@ -1,6 +1,12 @@
 import React from 'react'
+import { useEnvelopesStore } from '../../../../stores/envelopeStore'
+import { useUserStore } from '../../../../stores/userStore'
 
 const NewEnvelope = () => {
+    //# Stores
+    const user = useUserStore(state => state.user)
+    const envelopesStore = useEnvelopesStore()
+    const { saveEnvelope } = envelopesStore
     //* states
     const [name, setName] = React.useState<string>('')
     const [limit, setLimit] = React.useState<number>(0)
@@ -9,10 +15,26 @@ const NewEnvelope = () => {
     const [errors, setErrors] = React.useState<string>('')
 
 
-    const handleSubmit = {
+    const handleSubmit = async (e) => {
+        e.preventDefault()
 
+        const NewEnvelope = {
+            name,
+            limit,
+            balance,
+            description,
+            transactions: [],
+            user_id: user?.uid
+        }
+
+        await saveEnvelope(NewEnvelope)
+
+        setName('')
+        setDescription('')
+        setLimit(0)
+        setBalance(0)
     }
-    
+
   return (
     <div className='flex flex-col p-4'>
         <h1 className='text-2vw mb-6'>Create a New Envelope</h1>

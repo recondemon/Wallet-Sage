@@ -1,4 +1,4 @@
-from .. import db #pylint: disable=relative-beyond-top-level
+from .. import db
 from datetime import datetime
 
 class Envelope(db.Model):
@@ -9,11 +9,10 @@ class Envelope(db.Model):
     description = db.Column(db.Text, nullable=True)
     limit = db.Column(db.Integer, nullable=False)
     balance = db.Column(db.Integer, nullable=False)
-    transactions = db.relationship('Transaction', backref='envelope', lazy=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
-    user = db.relationship('User', backref='envelopes', lazy=True)
+    transactions = db.relationship('Transaction', backref='envelope', lazy=True)
 
     def to_dict(self):
         return {

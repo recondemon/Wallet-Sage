@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from ..models.user import User
+from ..models.envelope import Envelope
 from .. import db
 from datetime import datetime
 import logging
@@ -35,3 +36,18 @@ def create_envelope():
     logging.info(f"Envelope '{name}' created for user {user_id}")
     
     return jsonify(envelope=envelope.to_dict()), 201
+
+#****** Get Envelopes Route ******#
+@envelope_bp.route('/get', methods=['POST'])
+def get_envelopes():
+    user_id = request.json.get('user_id')
+
+    user = User.query.filter_by(uid=user_id).first()
+    if user is None:
+        logging.error(f"User not found for UID: {user_id}")
+        return jsonify({"error": "User not found"}), 404
+
+    envelopes = Envelope.query.filter_by(user_id=user.id).all()
+    envelopes = [envelope.to_dict() for envelope in envelopes]
+
+    return jsonify(envelopes=envelopes), 200
