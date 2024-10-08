@@ -1,52 +1,30 @@
 import React from 'react';
+import { useTransactionStore } from '../../../../stores/transactionStore';
 
 const Transactions = () => {
+  //# stores
+  const transactions = useTransactionStore((state) => state.transactions);
+
   return (
-  <div className='border border-border w-full'>
-    <div className='flex justify-between items-center p-4'>
-      <h1 className='text-2xl font-semibold'>Transactions</h1>
-      <button className='text-primary'>View All</button>
-    </div>
-    <div className='flex flex-col gap-4 p-4'>
-      <div className='flex justify-between items-center'>
-        <div className='flex gap-4 items-center'>
-          <div className='bg-primary w-10 h-10 rounded-lg'></div>
-          <div>
-            <h1 className='text-lg font-semibold'>Netflix</h1>
-            <p className='text-sm text-secondary'>Subscription</p>
-          </div>
-        </div>
-        <div>
-          <h1 className='text-lg font-semibold'>-$15.00</h1>
-          <p className='text-sm text-secondary'>12:00 PM</p>
-        </div>
-      </div>
-      <div className='flex justify-between items-center'>
-        <div className='flex gap-4 items-center'>
-          <div className='bg-primary w-10 h-10 rounded-lg'></div>
-          <div>
-            <h1 className='text-lg font-semibold'>Netflix</h1>
-            <p className='text-sm text-secondary'>Subscription</p>
-          </div>
-        </div>
-        <div>
-          <h1 className='text-lg font-semibold'>-$15.00</h1>
-          <p className='text-sm text-secondary'>12:00 PM</p>
-        </div>
-      </div>
-      <div className='flex justify-between items-center'>
-        <div className='flex gap-4 items-center'>
-          <div className='bg-primary w-10 h-10 rounded-lg'></div>
-          <div>
-            <h1 className='text-lg font-semibold'>Netflix</h1>
-            <p className='text-sm text-secondary'>Subscription</p>
-          </div>
-        </div>
-        <div>
-          <h1 className='text-lg font-semibold'>-$15.00</h1>
-          <p className='text-sm text-secondary'>12:00 PM</p>
-        </div>
-      </div>
+  <div className='flex flex-col w-full p-4'>
+    <h1 className='text-2vw font-semibold'>Transactions</h1>
+    <div className='border border-border w-full rounded-lg'>
+        {Array.isArray(transactions) && transactions.length > 0 ? (
+          transactions.map((transaction) => (
+            <div key={transaction.id} className='grid grid-cols-4 p-4 gap-2 hover:bg-card hover:cursor-point'>
+              <div className='flex justify-startS'>
+                <p>{transaction.name}</p>
+              </div>
+              <p>{transaction.category}</p>
+              <p>{transaction.merchant_name}</p>
+              <div className='flex justify-end'>
+                <p>{transaction.amount}</p>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p>No transactions available</p>
+        )}
     </div>
   </div>
 );

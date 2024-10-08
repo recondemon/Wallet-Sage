@@ -13,6 +13,7 @@ import {
 import Dropdown from '../../../UI/DropDown';
 import { useSavingsGoalStore } from '../../../../stores/savingsGoalStore';
 import Balance from './Balance';
+import { useTransactionStore } from '../../../../stores/transactionStore';
 interface AccountsProps {
   accounts: Account[];
 }
@@ -22,8 +23,9 @@ const Accounts: React.FC<AccountsProps> = ({ accounts }) => {
   const refreshAccounts = usePlaidStore((state) => state.refreshAccounts);
   const savingsGoals = useSavingsGoalStore((state) => state.savingsGoals);
   const getAndUpdateSavingsGoals = useSavingsGoalStore(
-    (state) => state.getAndUpdateSavingsGoals
-  );
+    (state) => state.getAndUpdateSavingsGoals);
+  const transactions = useTransactionStore((state) => state.transactions);
+  const fetchAllTransactions = useTransactionStore((state) => state.fetchAllTransactions);
 
   //* Drop down state
   const [menuOpen, setMenuOpen] = useState(false);
@@ -36,6 +38,10 @@ const Accounts: React.FC<AccountsProps> = ({ accounts }) => {
     console.log('refreshing savings goals');
     getAndUpdateSavingsGoals(user?.uid ?? '');
     console.log('savings goals:', savingsGoals);
+
+    console.log('refreshing transactions');
+    fetchAllTransactions(user?.uid ?? '');
+    console.log('transactions:', transactions);
   };
 
   return (

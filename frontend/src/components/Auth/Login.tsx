@@ -4,6 +4,7 @@ import { auth } from '../../lib/firebase/firebase';
 import { useUserStore } from '../../stores/userStore';
 import { usePlaidStore } from '../../stores/plaidStore';
 import { useSavingsGoalStore } from '../../stores/savingsGoalStore';
+import { useTransactionStore } from '../../stores/transactionStore';
 
 interface LoginProps {
   onClose: () => void;
@@ -11,6 +12,7 @@ interface LoginProps {
 
 const Login: React.FC<LoginProps> = ({ onClose }) => {
   //* stores
+  const transactions = useTransactionStore((state) => state.transactions);
   const user = useUserStore((state) => state.user);
   const savingsGoals = useSavingsGoalStore((state) => state.savingsGoals);
 
@@ -73,6 +75,12 @@ const Login: React.FC<LoginProps> = ({ onClose }) => {
       console.log('user:', user);
       console.log('savingsGoals:', savingsGoals);
 
+      console.log('fetching transactions')
+      const fetchAllTransactions = useTransactionStore((state) => state.fetchAllTransactions)
+      await fetchAllTransactions(firebaseUser.uid)
+
+      console.log('transactions: ', transactions)
+      
       onClose();
     } catch (error) {
       setError('Login failed, please try again.');

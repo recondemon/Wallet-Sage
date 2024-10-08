@@ -32,3 +32,12 @@ export interface Envelope {
   limit: number;
   user_id: string;
 }
+
+export interface Transaction {
+  id: string;
+  amount: number;
+  date: string;
+  name: string;
+  account_id: string;
+  envelope_id: string;
+}

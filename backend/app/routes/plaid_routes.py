@@ -9,6 +9,7 @@ from plaid.model.item_public_token_exchange_request import ItemPublicTokenExchan
 from plaid.model.accounts_get_request import AccountsGetRequest
 from plaid.model.institutions_get_by_id_request import InstitutionsGetByIdRequest
 from plaid.model.accounts_balance_get_request import AccountsBalanceGetRequest
+from plaid.model.transactions_get_request import TransactionsGetRequest
 from app import plaid_client
 from sqlalchemy import Enum
 from enum import Enum as PyEnum
@@ -16,6 +17,9 @@ import traceback
 import logging
 import uuid
 import plaid
+from flask_cors import cross_origin
+from datetime import datetime, timedelta
+
 
 
 class AccountSubtype(Enum):
@@ -454,69 +458,77 @@ def refresh_accounts():
         logging.error(traceback.format_exc())
         return jsonify({"error": str(e)}), 500
     
-    #******** Fetch transactions from Plaid ********#
-    #**** Fetch transactions from Plaid ****#
+#******** Fetch transactions from Plaid ********#
 @plaid_bp.route('/fetch_transactions', methods=['POST'])
+@cross_origin() 
 def fetch_transactions():
-    user_uid = request.json.get('user_id')
+    user_id = request.json.get('user_id')
 
-    logging.info(f"Fetching transactions for user: {user_uid}")
+    logging.info(f"Fetching transactions for user: {user_id}")
 
-    user = User.query.filter_by(uid=user_uid).first()
+    user = User.query.filter_by(uid=user_id).first()
     if user is None:
-        logging.error(f"User not found for UID: {user_uid}")
+        logging.error(f"User not found for UID: {user_id}")
         return jsonify({"error": "User not found"}), 404
 
     access_token = user.plaid_access_token
     if not access_token:
-        logging.error(f"No Plaid access token found for user {user_uid}")
+        logging.error(f"No Plaid access token found for user {user_id}")
         return jsonify({"error": "No Plaid access token found for user"}), 400
 
     try:
-        # Set up date range (last 30 days)
-        start_date = (datetime.datetime.now() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
-        end_date = datetime.datetime.now().strftime('%Y-%m-%d')
+        start_date = (datetime.now() - timedelta(days=30)).date()
+        end_date = datetime.now().date()
 
-        # Fetch transactions from Plaid
-        transactions_request = TransactionsGetRequest(
-            access_token=access_token,
-            start_date=start_date,
-            end_date=end_date
-        )
+        accounts = Account.query.filter_by(user_id=user.id).all()
+        if not accounts:
+            logging.error(f"No accounts found for user {user_id}")
+            return jsonify({"error": "No accounts found for user"}), 400
 
-        transactions_response = plaid_client.transactions_get(transactions_request)
-        transactions = transactions_response['transactions']
+        transactions_to_add = []
+        for account in accounts:
+            transactions_request = TransactionsGetRequest(
+                access_token=access_token,
+                start_date=start_date,
+                end_date=end_date
+            )
+            transactions_response = plaid_client.transactions_get(transactions_request)
+            transactions = transactions_response['transactions']
 
-        logging.info(f"Plaid transactions response: {transactions}")
+            logging.info(f"Transactions fetched for account {account.account_id}: {transactions}")
 
-        for transaction in transactions:
-            # Check if transaction already exists in the database
-            existing_transaction = Transaction.query.filter_by(transaction_id=transaction['transaction_id']).first()
+            for transaction in transactions:
+                existing_transaction = Transaction.query.filter_by(transaction_id=transaction['transaction_id']).first()
 
-            if existing_transaction:
-                logging.info(f"Transaction {transaction['transaction_id']} already exists, skipping...")
-                continue
+                if existing_transaction:
+                    existing_transaction.name = transaction['name']
+                    existing_transaction.amount = transaction['amount']
+                    existing_transaction.date = transaction['date']
+                    existing_transaction.category = ', '.join(transaction['category']) if transaction.get('category') else None
+                    existing_transaction.merchant_name = transaction.get('merchant_name', None)
+                else:
+                    transaction_model = Transaction(
+                        transaction_id=transaction['transaction_id'],
+                        name=transaction['name'],
+                        amount=transaction['amount'],
+                        date=transaction['date'],
+                        account_id=account.id,
+                        envelope_id=None, 
+                        category=', '.join(transaction['category']) if transaction.get('category') else None,
+                        merchant_name=transaction.get('merchant_name', None)
+                    )
+                    transactions_to_add.append(transaction_model)
 
-            # Add new transaction to the database
-            account = Account.query.filter_by(account_id=transaction['account_id']).first()
-            if account:
-                transaction_model = Transaction(
-                    transaction_id=transaction['transaction_id'],
-                    name=transaction['name'],
-                    amount=transaction['amount'],
-                    date=datetime.datetime.strptime(transaction['date'], '%Y-%m-%d'),
-                    account_id=account.id,
-                    envelope_id=None,  # You can modify this based on how you want to link it to envelopes
-                    category=', '.join(transaction['category']) if transaction['category'] else None,
-                    merchant_name=transaction['merchant_name'] if transaction.get('merchant_name') else None
-                )
-                db.session.add(transaction_model)
+        if transactions_to_add:
+            db.session.add_all(transactions_to_add)
 
         db.session.commit()
 
+        updated_transactions = Transaction.query.join(Account).filter(Account.user_id == user.id).all()
+
         return jsonify({
             'status': 'success',
-            'transactions': [transaction['transaction_id'] for transaction in transactions]
+            'transactions': [t.to_dict() for t in updated_transactions]
         }), 200
 
     except plaid.ApiException as e:
@@ -526,6 +538,11 @@ def fetch_transactions():
         logging.error(f"Error fetching transactions: {str(e)}")
         logging.error(traceback.format_exc())
         return jsonify({"error": str(e)}), 500
+
+
+
+
+
 
 
 
