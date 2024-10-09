@@ -5,7 +5,7 @@ import Envelopes from './Envelopes/Envelopes';
 
 const MainContent = () => {
   return (
-    <div className="flex w-full h-full justify-start items-start">
+    <div className="flex w-full h-screen justify-start items-start">
       {/* Envelopes section on the left */}
       <div className="w-1/3 h-full">
         <Envelopes />
