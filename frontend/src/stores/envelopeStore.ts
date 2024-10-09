@@ -8,6 +8,7 @@ interface EnvelopesStore {
     saveEnvelope: (newEnvelope: Omit<Envelope, 'id'>) => void;
     getEnvelopes: (userId: string) => void;
     deleteEnvelope: (id: string, uid: string) => void;
+    assignTransactionToEnvelope: (transactionId: string, envelopeId: string, amount: number) => void;
 }
 
 
@@ -96,5 +97,12 @@ export const useEnvelopesStore = create<EnvelopesStore>()(
             }
           },
 
+          assignTransactionToEnvelope: (transactionId: string, envelopeId: string, amount: number) => {
+            set((state) => ({
+              envelopes: state.envelopes.map((envelope) =>
+                envelope.id === envelopeId ? { ...envelope, balance: envelope.balance + amount } : envelope
+              ),
+            }));
+          },
         })
       );

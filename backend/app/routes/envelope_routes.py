@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from ..models.user import User
 from ..models.envelope import Envelope
+from ..models.transaction import Transaction
 from .. import db
 from datetime import datetime
 import logging
@@ -64,7 +65,7 @@ def add_transaction():
         logging.error(f"Envelope not found for ID: {envelope_id}")
         return jsonify({"error": "Envelope not found"}), 404
 
-    transaction = Transaction.query.filter_by(transaction_id=transaction_id).first()
+    transaction = Transaction.query.filter_by(id=transaction_id).first()
     if transaction is None:
         logging.error(f"Transaction not found for ID: {transaction_id}")
         return jsonify({"error": "Transaction not found"}), 404
