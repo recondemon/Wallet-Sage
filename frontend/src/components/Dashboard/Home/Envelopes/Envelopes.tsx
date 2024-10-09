@@ -93,11 +93,11 @@ const Envelopes = () => {
             <Plus className="w-6 h-6 ml-2 h-10 w-10 hover:cursor-pointer hover:text-primary" />
         </div>
       </div>
-      <div className='grid grid-cols-2 gap-2 bg-card rounded-lg h-full'>
+      <div className='grid grid-cols-2 gap-2 bg-card rounded-lg max-h-[35vh] overflow-y-auto'>
         {envelopes.map((envelope) => (
           <div 
           key={envelope.id} 
-          className='flex flex-col gap-2 p-4 hover:bg-altBackground hover:cursor-pointer hover:text-primary rounded-lg transition duration-300'
+          className='flex flex-col p-2 hover:bg-altBackground hover:cursor-pointer hover:text-primary rounded-lg transition duration-300'
           onClick={() => handleOpenEnvelope(envelope)}
           >
             <EnvelopeItem envelope={envelope} />

@@ -15,11 +15,11 @@ const GoalDetails: React.FC<GoalDetailsProps> = ({ goal }) => {
   }, [goal]);
 
   return (
-    <div>
-      <h1 className="text-1vw font-bold">{name}</h1>
-      <p className="text-.8vw">Target: {goalAmount}</p>
-      <p className="text-.8vw">Saved: {balance}</p>
-      <p className="text-.8vw">Remaining: {remaining}</p>
+    <div className='flex flex-col gap-2'>
+      <h1 className="text-1.2vw font-bold">{name}</h1>
+      <p className="text-1vw">Target: {goalAmount}</p>
+      <p className="text-1vw">Saved: {balance}</p>
+      <p className="text-18vw">Remaining: {remaining}</p>
     </div>
   );
 };

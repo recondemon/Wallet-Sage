@@ -97,27 +97,27 @@ const SaveGoal = () => {
           <Plus className="w-6 h-6 ml-2 hover:cursor-pointer hover:text-primary h-10 w-10" />
         </div>
       </div>
-      <div className="flex flex-col gap-4 bg-card rounded-lg p-4">
+      <div className="flex flex-col gap-4 rounded-lg p-4">
         <div
-          className="flex w-full p-4 rounded-lg hover:bg-altBackground hover:cursor-pointer transition duration-300"
+          className="flex w-full p-4 justify-center items-center rounded-lg hover:bg-altBackground hover:cursor-pointer transition duration-300"
           onClick={handleOpenGoalModal}
         >
+          <ChevronLeft
+            className="w-10 h-10 hover:cursor-pointer hover:text-primary"
+            onClick={handlePreviousGoal}
+          />
           <div className="w-1/2 h-full">
             <ChartComponent goal={currentGoal} />
           </div>
           <div className="w-1/2 px-4">
             <GoalDetails goal={currentGoal} />
           </div>
-        </div>
-        <div className="flex justify-between">
-          <ChevronLeft
-            className="w-10 h-10 hover:cursor-pointer hover:text-primary"
-            onClick={handlePreviousGoal}
-          />
           <ChevronRight
             className="w-10 h-10 hover:cursor-pointer hover:text-primary"
             onClick={handleNextGoal}
           />
+        </div>
+        <div className="flex justify-between">
         </div>
       </div>
       {isOpen && (
