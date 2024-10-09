@@ -7,11 +7,12 @@ interface EnvelopesStore {
     addEnvelope: (envelope: Envelope) => void;
     saveEnvelope: (newEnvelope: Omit<Envelope, 'id'>) => void;
     getEnvelopes: (userId: string) => void;
+    deleteEnvelope: (id: string, uid: string) => void;
 }
 
 
 export const useEnvelopesStore = create<EnvelopesStore>()(
-    (set) => ({
+    (set, get) => ({
         envelopes: [],
         //# Set Envelope List
         setEnvelopes: (envelopes) => set(() => ({envelopes})),
@@ -66,6 +67,34 @@ export const useEnvelopesStore = create<EnvelopesStore>()(
                 console.error('Error fetching envelopes:', error);
             }
         },
+
+        deleteEnvelope: async (id: string, uid: string) => {
+            const currentState = get().envelopes;
+    
+            set((state) => ({
+              envelopes: state.envelopes.filter((envelope) => envelope.id !== id),
+            }));
+    
+            try {
+              const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/envelope/delete`, {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ envelopeId: id, uid }),
+              });
+    
+              if (!response.ok) {
+                throw new Error('Failed to delete envelope from the server.');
+              }
+            } catch (error) {
+              console.error('Error deleting envelope:', error);
+    
+              set(() => ({
+                envelopes: currentState,
+              }));
+            }
+          },
 
         })
       );
