@@ -6,9 +6,9 @@ const Transactions = () => {
   const transactions = useTransactionStore((state) => state.transactions);
 
   return (
-  <div className='flex flex-col w-full p-4'>
+  <div className='flex flex-col w-full'>
     <h1 className='text-2vw font-semibold'>Transactions</h1>
-    <div className='border border-border w-full rounded-lg'>
+    <div className='border border-border w-full rounded-lg h-[50vh] overflow-y-auto'>
         {Array.isArray(transactions) && transactions.length > 0 ? (
           transactions.map((transaction) => (
             <div key={transaction.id} className='grid grid-cols-4 p-4 gap-2 hover:bg-card hover:cursor-point'>

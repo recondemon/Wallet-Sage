@@ -84,20 +84,20 @@ const Envelopes = () => {
   }
 
   return(
-    <div className='flex flex-col p-4 min-w-[30vw] min-h-[30vh] w-full rounded-lg'>
-      <div className="flex justify-between mb-4">
-        <h1 className='text-2vw font-semibold'>
-          Envelopes
-        </h1>
+    <div className='flex flex-col p-4 w-[20vw] rounded-lg bg-card py-4 px-2 border-r'>
+      <div className="flex justify-between items-center mb-4 px-2">
         <div onClick={handleOpenNewEnvelope} className="flex justify-center items-center">
-            <Plus className="w-6 h-6 ml-2 h-10 w-10 hover:cursor-pointer hover:text-primary" />
+          <h1 className='text-2vw font-semibold'>
+            Envelopes
+          </h1>
         </div>
+          <Plus className="w-6 h-6 ml-2 h-10 w-10 hover:cursor-pointer hover:text-primary" />
       </div>
-      <div className='grid grid-cols-2 gap-2 bg-card rounded-lg max-h-[35vh] overflow-y-auto'>
+      <div className='flex flex-col gap-2 rounded-lg h-[95vh] overflow-y-auto'>
         {envelopes.map((envelope) => (
           <div 
           key={envelope.id} 
-          className='flex flex-col p-2 hover:bg-altBackground hover:cursor-pointer hover:text-primary rounded-lg transition duration-300'
+          className='flex flex-col p-2 w-full hover:bg-altBackground hover:cursor-pointer hover:text-primary rounded-lg transition duration-300'
           onClick={() => handleOpenEnvelope(envelope)}
           >
             <EnvelopeItem envelope={envelope} />

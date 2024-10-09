@@ -30,10 +30,10 @@ const Home = () => {
 
   return (
     <div className="flex rounded-lg justify-between items-center w-full h-screen gap-4">
-      <div className="flex flex-col gap-4 w-[70vw] h-full">
+      <div className="flex flex-col gap-4 w-4/5 h-full">
         <MainContent />
       </div>
-      <div className="flex flex-col w-[20vw] h-full border-l-2 bg-card">
+      <div className="flex flex-col w-1/5 h-full border-l-2 bg-card">
         <Accounts accounts={accounts} />
       </div>
     </div>
