@@ -14,15 +14,13 @@ interface NoGoalsProps {
 const NoGoalsPlaceholder: React.FC<NoGoalsProps> = ({ onCreateGoal }) => {
   return (
     <div
-      className="flex w-full p-4 bg-card rounded-lg h-[30vh] hover:bg-altBackground transition duration-300"
+      className="flex w-full p-4 rounded-lg h-[30vh] hover:bg-altBackground transition duration-300"
       onClick={onCreateGoal}
     >
       <div className="w-1/2 h-full flex items-center justify-center">
-        {/* Placeholder for Chart */}
         <div className="w-40 h-40 bg-gray-200 rounded-full animate-pulse"></div>
       </div>
       <div className="w-1/2 px-4 flex flex-col justify-center">
-        {/* Placeholder for Goal Details */}
         <div className="w-full h-6 bg-gray-200 rounded-md mb-4 animate-pulse"></div>
         <div className="w-2/3 h-4 bg-gray-200 rounded-md mb-2 animate-pulse"></div>
         <div className="w-1/2 h-4 bg-gray-200 rounded-md mb-2 animate-pulse"></div>
@@ -73,7 +71,7 @@ const SaveGoal = () => {
   //* No goals fallback
   if (savingsGoals.length === 0) {
     return (
-      <div className="flex flex-col p-4 min-w-[20vw] w-full h-[30vh] rounded-lg">
+      <div className="flex flex-col p-4 w-full min-h-[30vh] max-h-[30vh] rounded-lg">
         <div className="flex justify-between w-full mb-4">
           <h1 className="text-2vw font-semibold">Savings Goals</h1>
           <div onClick={handleOpenNewGoal} className='flex justify-center items-center'>
@@ -93,7 +91,7 @@ const SaveGoal = () => {
   const currentGoal = savingsGoals[selectedGoalIndex];
 
   return (
-    <div className="flex flex-col p-4 min-w-[20vw] min-h-[30vh] w-full rounded-lg ">
+    <div className="flex flex-col p-4 w-full min-h-[30vh] max-h-[30vh] rounded-lg">
       <div className="flex justify-between w-full mb-4">
         <h1 className="text-2vw font-semibold">Savings Goals</h1>
         <div onClick={handleOpenNewGoal} className='flex justify-center items-center'>

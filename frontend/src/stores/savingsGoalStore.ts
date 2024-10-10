@@ -12,7 +12,6 @@ interface SavingsGoalStore {
 }
 
 export const useSavingsGoalStore = create<SavingsGoalStore>()(
-  persist(
     (set, get) => ({
       savingsGoals: [],
       accounts: [],
@@ -111,9 +110,4 @@ export const useSavingsGoalStore = create<SavingsGoalStore>()(
         }
       },
     }),
-    {
-      name: 'savings-goal-storage',
-      storage: createJSONStorage(() => localStorage),
-    }
-  )
 );

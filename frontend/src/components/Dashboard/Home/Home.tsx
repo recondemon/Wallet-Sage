@@ -29,7 +29,7 @@ const Home = () => {
   }, [auth, user, accounts, navigate, fetchPlaidData, user?.uid]);
 
   return (
-    <div className="flex rounded-lg justify-between items-center w-full h-screen gap-4">
+    <div className="flex rounded-lg justify-between items-center w-full h-screen">
       <div className="flex flex-col gap-4 w-4/5 h-full">
         <MainContent />
       </div>

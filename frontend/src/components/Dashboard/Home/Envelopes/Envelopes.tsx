@@ -69,7 +69,7 @@ const Envelopes = () => {
   // If no envelopes exist, display the placeholder and button
   if (envelopes.length === 0) {
     return (
-      <div className='flex flex-col p-4 h-full w-[20vw] rounded-lg bg-card py-4 px-2 border-r'>
+      <div className='flex flex-col h-full w-[20vw] rounded-lg bg-card py-4 px-2 border-r'>
         <div className="flex justify-between w-full mb-4">
           <h1 className='text-2vw font-semibold'>
             Envelopes
