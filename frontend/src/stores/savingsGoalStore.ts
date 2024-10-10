@@ -8,6 +8,7 @@ interface SavingsGoalStore {
   addSavingsGoal: (savingsGoal: SavingsGoal) => Promise<void>;
   removeSavingsGoal: (id: string, uid: string) => Promise<void>;
   getAndUpdateSavingsGoals: (userId: string) => Promise<void>;
+  
 }
 
 export const useSavingsGoalStore = create<SavingsGoalStore>()(

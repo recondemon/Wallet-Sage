@@ -6,8 +6,13 @@ import { useEnvelopesStore } from "../../../../stores/envelopeStore";
 import EnvelopeItem from "./EnvelopeItem";
 import { useUserStore } from "../../../../stores/userStore";
 import EnvelopeDetails from "./EnvelopeDetails";
+import { Envelope } from "../../../../lib/types/AccountTypes";
 
-const NoEnvelopesPlaceholder = ({ onCreateEnvelope }) => {
+interface NoEnvelopesProps {
+  onCreateEnvelope: () => void;
+}
+
+const NoEnvelopesPlaceholder: React.FC<NoEnvelopesProps> = ({ onCreateEnvelope }) => {
   return (
     <div
       className="flex w-full p-4 bg-card h-[30vh] rounded-lg hover:bg-altBackground transition duration-300"
@@ -43,7 +48,7 @@ const Envelopes = () => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [openEnvelope, setOpenEnvelope] = useState(false);
-  const [envelopeView, setEnvelopeView] = useState(null);
+  const [envelopeView, setEnvelopeView] = useState<Envelope | null>(null);
 
   useEffect(() => {
     if(user){
@@ -56,7 +61,7 @@ const Envelopes = () => {
     setIsOpen(true);
   };
 
-  const handleOpenEnvelope = (envelope) => {
+  const handleOpenEnvelope = (envelope: Envelope) => {
     setOpenEnvelope(true);
     setEnvelopeView(envelope);
   };
@@ -109,7 +114,7 @@ const Envelopes = () => {
             <NewEnvelope setIsOpen={setIsOpen}/>
           </UniversalModal>
         )}
-        {openEnvelope && (
+        {openEnvelope && envelopeView &&(
           <UniversalModal onClose={() => setOpenEnvelope(false)}>
             <EnvelopeDetails envelope={envelopeView} />
           </UniversalModal>

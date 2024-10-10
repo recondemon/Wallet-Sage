@@ -3,7 +3,7 @@ import SavingAccounts from './SavingAccounts';
 import { usePlaidStore } from '../../../../stores/plaidStore';
 import { ArrowLeft, Plus } from 'lucide-react';
 import ProgressBar from '../../../UI/ProgressBsr';
-import { Account } from '../../../../lib/types/AccountTypes';
+import { Account, SavingsGoal } from '../../../../lib/types/AccountTypes';
 import StartingProgress from './StartingProgress';
 import { useSavingsGoalStore } from '../../../../stores/savingsGoalStore';
 import { useUserStore } from '../../../../stores/userStore';
@@ -64,7 +64,7 @@ const NewSavingsGoal: React.FC<NewSavingsGoalProps> = () => {
       return;
     }
     console.log(goalAccounts);
-    const savingsGoalData = {
+    const savingsGoalData: SavingsGoal = {
       uid: user?.uid,
       name: goalName,
       goal: goalTarget,
@@ -73,9 +73,6 @@ const NewSavingsGoal: React.FC<NewSavingsGoalProps> = () => {
       ...(description && { description }),
     };
     addSavingsGoal(savingsGoalData)
-      .then(() => {
-        onSuccess();
-      })
       .catch((error) => {
         setErrors('Failed to create savings goal. Please try again.');
         console.error('Error creating savings goal:', error);
@@ -150,9 +147,6 @@ const NewSavingsGoal: React.FC<NewSavingsGoalProps> = () => {
             <StartingProgress
               goalTarget={goalTarget}
               startingBalance={startingBalance}
-              progressColor="altBackground"
-              borderColor="primary"
-              backgroundColor="input"
             />
           )}
         </div>

@@ -13,13 +13,14 @@ export interface Institution {
 }
 
 export interface SavingsGoal {
-  id: string;
+  id?: string;
   name: string;
   goal: number;
   balance: number;
   description?: string;
   accounts: string[];
-  userId: string;
+  userId?: string;
+  uid?: string | undefined;
 }
 
 export interface Envelope {
@@ -31,6 +32,7 @@ export interface Envelope {
   userId: string;
   limit: number;
   user_id: string;
+  transactions: Transaction[];
 }
 
 export interface Transaction {

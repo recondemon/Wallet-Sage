@@ -7,8 +7,11 @@ import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Plus } from 'lucide-r
 import UniversalModal from '../../../Modals/UniversalModal';
 import NewSavingsGoal from './NewSavingsGoal';
 
+interface NoGoalsProps {
+  onCreateGoal: () => void;
+}
 
-const NoGoalsPlaceholder = ({ onCreateGoal }) => {
+const NoGoalsPlaceholder: React.FC<NoGoalsProps> = ({ onCreateGoal }) => {
   return (
     <div
       className="flex w-full p-4 bg-card rounded-lg h-[30vh] hover:bg-altBackground transition duration-300"
