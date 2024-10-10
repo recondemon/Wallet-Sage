@@ -460,12 +460,13 @@ def refresh_accounts():
     
 #******** Fetch transactions from Plaid ********#
 @plaid_bp.route('/fetch_transactions', methods=['POST'])
-@cross_origin() 
+@cross_origin()
 def fetch_transactions():
     user_id = request.json.get('user_id')
 
     logging.info(f"Fetching transactions for user: {user_id}")
 
+    # Fetch the user from the database
     user = User.query.filter_by(uid=user_id).first()
     if user is None:
         logging.error(f"User not found for UID: {user_id}")
@@ -477,9 +478,11 @@ def fetch_transactions():
         return jsonify({"error": "No Plaid access token found for user"}), 400
 
     try:
+        # Fetch the date range for transactions
         start_date = (datetime.now() - timedelta(days=30)).date()
         end_date = datetime.now().date()
 
+        # Get all accounts for the user
         accounts = Account.query.filter_by(user_id=user.id).all()
         if not accounts:
             logging.error(f"No accounts found for user {user_id}")
@@ -487,6 +490,7 @@ def fetch_transactions():
 
         transactions_to_add = []
         for account in accounts:
+            # Fetch transactions from Plaid
             transactions_request = TransactionsGetRequest(
                 access_token=access_token,
                 start_date=start_date,
@@ -497,33 +501,40 @@ def fetch_transactions():
 
             logging.info(f"Transactions fetched for account {account.account_id}: {transactions}")
 
+            # Check and update or insert transactions
             for transaction in transactions:
                 existing_transaction = Transaction.query.filter_by(transaction_id=transaction['transaction_id']).first()
 
                 if existing_transaction:
+                    # If the transaction exists, update its fields
                     existing_transaction.name = transaction['name']
                     existing_transaction.amount = transaction['amount']
                     existing_transaction.date = transaction['date']
                     existing_transaction.category = ', '.join(transaction['category']) if transaction.get('category') else None
                     existing_transaction.merchant_name = transaction.get('merchant_name', None)
+                    db.session.add(existing_transaction)  # Mark as updated
                 else:
+                    # If it's a new transaction, create and prepare for insertion
                     transaction_model = Transaction(
                         transaction_id=transaction['transaction_id'],
                         name=transaction['name'],
                         amount=transaction['amount'],
                         date=transaction['date'],
                         account_id=account.id,
-                        envelope_id=None, 
+                        envelope_id=None,  # Adjust if envelope logic is needed
                         category=', '.join(transaction['category']) if transaction.get('category') else None,
                         merchant_name=transaction.get('merchant_name', None)
                     )
                     transactions_to_add.append(transaction_model)
 
+        # If there are new transactions to add, bulk insert them
         if transactions_to_add:
             db.session.add_all(transactions_to_add)
 
+        # Commit both updates to existing transactions and new transactions
         db.session.commit()
 
+        # Fetch updated transactions and return them
         updated_transactions = Transaction.query.join(Account).filter(Account.user_id == user.id).all()
 
         return jsonify({
@@ -537,7 +548,9 @@ def fetch_transactions():
     except Exception as e:
         logging.error(f"Error fetching transactions: {str(e)}")
         logging.error(traceback.format_exc())
+        db.session.rollback()  # Rollback in case of error
         return jsonify({"error": str(e)}), 500
+
 
 
 

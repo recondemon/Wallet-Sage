@@ -1,6 +1,7 @@
 import { usePlaidLink } from 'react-plaid-link';
 import { useEffect, useState } from 'react';
 import { usePlaidStore } from '../../stores/plaidStore';
+import { useTransactionStore } from '../../stores/transactionStore';
 
 interface PlaidLinkButtonProps {
   userId: string | undefined;
@@ -65,6 +66,9 @@ export const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({ userId }) => {
     console.log('Accounts data:', accountsData);
     setInstitutions(accountsData.institutions);
     setAccounts(accountsData.accounts);
+
+    const fetchTransactions = useTransactionStore((state) => state.fetchAllTransactions);
+    await fetchTransactions(userId);
   };
 
   const config = {

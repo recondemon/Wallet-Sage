@@ -18,7 +18,6 @@ interface PlaidStore {
 }
 
 export const usePlaidStore = create<PlaidStore>()(
-  persist(
     (set) => ({
       institutions: [],
       accounts: [],
@@ -107,9 +106,4 @@ export const usePlaidStore = create<PlaidStore>()(
         }
       },
     }),
-    {
-      name: 'plaid-storage',
-      storage: createJSONStorage(() => localStorage),
-    }
-  )
 );

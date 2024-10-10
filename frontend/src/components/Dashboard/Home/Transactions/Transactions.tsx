@@ -1,17 +1,71 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTransactionStore } from '../../../../stores/transactionStore';
 import { useEnvelopesStore } from '../../../../stores/envelopeStore';
+import { useUserStore } from '../../../../stores/userStore';
+import { usePlaidStore } from '../../../../stores/plaidStore';
+
+interface NoTransactionsProps {
+  onCreateTransaction: () => void;
+}
 
 const Transactions = () => {
-  //# stores
+  //* stores
   const transactions = useTransactionStore((state) => state.transactions);
   const envelopes = useEnvelopesStore((state) => state.envelopes);
+  const user = useUserStore((state) => state.user);
+  const fetchAllTransactions = useTransactionStore((state) => state.fetchAllTransactions);
 
-  //# states
+  //* states
   const [selectedEnvelope, setSelectedEnvelope] = React.useState({}); 
+  const accounts = usePlaidStore((state) => state.accounts);
+
+  //* Placeholder for no transactions
+  const NoTransactionsPlaceholder: React.FC<NoTransactionsProps> = ({ onCreateTransaction }) => {
+    if(accounts.length === 0){
+      return (
+        <div
+          className="flex w-full p-4 rounded-lg"
+          onClick={onCreateTransaction}
+        >
+          <div className="w-full px-4 gap-6 mt-6 flex flex-col justify-center">
+            <div className="w-full h-6 bg-gray-400 rounded-md animate-pulse"></div>
+            <div className="w-full h-6 bg-gray-400 rounded-md animate-pulse"></div>
+            <div className="w-full h-6 bg-gray-400 rounded-md animate-pulse"></div>
+            <div className="w-full h-6 bg-gray-400 rounded-md animate-pulse"></div>
+          </div>
+        </div>
+      )
+    } else {
+      return (
+        <div
+          className="flex w-full p-4 rounded-lg"
+          onClick={onCreateTransaction}
+        >
+          <div className='mb-4'>
+            <h1 className='text-2vw'>
+              Fetching Transactions...
+            </h1>
+          </div>
+          <div className="w-full px-4 gap-6 mt-6 flex flex-col justify-center">
+            <div className="w-full h-6 bg-gray-400 rounded-md animate-pulse"></div>
+            <div className="w-full h-6 bg-gray-400 rounded-md animate-pulse"></div>
+            <div className="w-full h-6 bg-gray-400 rounded-md animate-pulse"></div>
+            <div className="w-full h-6 bg-gray-400 rounded-md animate-pulse"></div>
+          </div>
+        </div>
+      )
+    }
+  }
+
+  //* onMount get transactions if none
+  useEffect(() => {
+    if (user && transactions.length === 0) {
+      fetchAllTransactions(user.uid);
+    }
+  }, [user, transactions, fetchAllTransactions]);
 
 
-  const handleAssignEnvelope = async (transactionId, envelopeId, amount) => {
+  const handleAssignEnvelope = async (transactionId: string, envelopeId: string, amount:number) => {
     const assignTransactionToEnvelope = useEnvelopesStore((state) => state.assignTransactionToEnvelope);
   
     try {
@@ -81,7 +135,7 @@ const Transactions = () => {
             </div>
           ))
         ) : (
-          <p>No transactions available</p>
+          <NoTransactionsPlaceholder onCreateTransaction={() => console.log('Create transaction')} />
         )}
     </div>
   </div>

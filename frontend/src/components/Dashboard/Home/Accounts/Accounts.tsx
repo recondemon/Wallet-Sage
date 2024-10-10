@@ -44,6 +44,10 @@ const Accounts: React.FC<AccountsProps> = ({ accounts }) => {
     console.log('transactions:', transactions);
   };
 
+  useEffect(() => {
+    handleRefresh();
+  }, []);
+
   return (
     <div className="flex flex-col p-4 w-full rounded-lg pt-8">
       <div className="flex gap-2 justify-between pb-2">

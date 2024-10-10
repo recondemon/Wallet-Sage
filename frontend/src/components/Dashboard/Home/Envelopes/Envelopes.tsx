@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { ArrowLeft, ArrowRight, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import UniversalModal from "../../../Modals/UniversalModal";
 import NewEnvelope from "./NewEnvelope";
@@ -12,10 +12,11 @@ interface NoEnvelopesProps {
   onCreateEnvelope: () => void;
 }
 
+//* Placeholder for no Envelopes Yet
 const NoEnvelopesPlaceholder: React.FC<NoEnvelopesProps> = ({ onCreateEnvelope }) => {
   return (
     <div
-      className="flex w-full p-4 bg-card rounded-lg hover:bg-altBackground transition duration-300"
+      className="flex w-full p-4 rounded-lg hover:bg-altBackground transition duration-300"
       onClick={onCreateEnvelope}
     >
       <div className="w-full px-4 flex flex-col justify-center">
@@ -41,14 +42,17 @@ const NoEnvelopesPlaceholder: React.FC<NoEnvelopesProps> = ({ onCreateEnvelope }
 };
 
 const Envelopes = () => {
-  //# Stores
+  //* Stores
   const envelopes = useEnvelopesStore((state) => state.envelopes);
   const getEnvelopes = useEnvelopesStore((state) => state.getEnvelopes);
   const user = useUserStore((state) => state.user);
 
+  //* States
   const [isOpen, setIsOpen] = useState(false);
   const [openEnvelope, setOpenEnvelope] = useState(false);
   const [envelopeView, setEnvelopeView] = useState<Envelope | null>(null);
+  const [panelOpen, setPanelOpen] = useState(true);
+
 
   useEffect(() => {
     if(user){
@@ -66,30 +70,48 @@ const Envelopes = () => {
     setEnvelopeView(envelope);
   };
 
-  // If no envelopes exist, display the placeholder and button
+  //* Display placeholder if no envelopes
   if (envelopes.length === 0) {
-    return (
-      <div className='flex flex-col h-full w-[20vw] rounded-lg bg-card py-4 px-2 border-r'>
-        <div className="flex justify-between w-full mb-4">
-          <h1 className='text-2vw font-semibold'>
-            Envelopes
-          </h1>
-          <div onClick={handleOpenNewEnvelope} className="flex justify-center items-center"> 
-            <Plus className="w-8 h-8 ml-2 hover:cursor-pointer hover:text-primary" />
+    if (panelOpen) {
+      return (
+        <div className='flex flex-col h-full w-[20vw] rounded-lg py-4 px-2 border-r'>
+          <div className="flex justify-end mb-4">
+            <ArrowLeft className="w-8 h-8 hover:cursor-pointer hover:text-primary" onClick={() => setPanelOpen(false)} />
+          </div>
+          <div className="flex justify-between w-full mb-4">
+            <h1 className='text-2vw font-semibold'>
+              Envelopes
+            </h1>
+            <div onClick={handleOpenNewEnvelope} className="flex justify-center items-center"> 
+              <Plus className="w-8 h-8 ml-2 hover:cursor-pointer hover:text-primary" />
+            </div>
+          </div>
+          <NoEnvelopesPlaceholder onCreateEnvelope={handleOpenNewEnvelope} />
+          {isOpen && (
+            <UniversalModal onClose={() => setIsOpen(false)}>
+              <NewEnvelope setIsOpen={setIsOpen} /> 
+            </UniversalModal>
+          )}
+        </div>
+      );
+    } else {
+      return (
+        <div className='flex flex-col h-full w-[4vw] rounded-lg py-4 px-2 border-r'>
+          <div className="flex justify-end mb-4">
+            <ArrowRight className="w-8 h-8 hover:cursor-pointer hover:text-primary" onClick={() => setPanelOpen(true)} />
           </div>
         </div>
-        <NoEnvelopesPlaceholder onCreateEnvelope={handleOpenNewEnvelope} />
-        {isOpen && (
-          <UniversalModal onClose={() => setIsOpen(false)}>
-            <NewEnvelope setIsOpen={setIsOpen} /> 
-          </UniversalModal>
-        )}
-      </div>
-    );
+      );
+    }
   }
+  
 
+  //* Display Envelopes
   return(
     <div className='flex flex-col p-4 h-full w-[20vw] rounded-lg bg-card py-4 px-2 border-r'>
+      <div className="flex justify-end mb-4">
+        <ArrowLeft className="w-8 h-8 hover:cursor-pointer hover:text-primary" onClick={() => setPanelOpen(false)} />
+      </div>
       <div className="flex justify-between items-center mb-4 px-2">
         <div onClick={handleOpenNewEnvelope} className="flex justify-center items-center">
           <h1 className='text-2vw font-semibold'>
